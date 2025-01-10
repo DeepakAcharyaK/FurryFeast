@@ -8,7 +8,6 @@ const donationSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: [true, "Please enter a valid email address"],
     },
     contact: {
         type: String,

@@ -1,3 +1,4 @@
+const { type } = require('@testing-library/user-event/dist/type');
 const mongoose = require('mongoose');
 
 const volunteerSchema = mongoose.Schema({
@@ -6,12 +7,11 @@ const volunteerSchema = mongoose.Schema({
         required:[true, "Plaease enter a username"]
     },
     contact:{
-        type:String,
+        type:Number,
         required:[true, "Please enter a phone number"]
     },
     availability:{
-        type:Date,
-        default:Date.now,
+        type:Number,
         required:[true, "Plaese enter the rescue data"]
     },
     description:{

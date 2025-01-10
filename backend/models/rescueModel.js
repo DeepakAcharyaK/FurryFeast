@@ -1,31 +1,42 @@
 const mongoose = require('mongoose');
 
-const rescueSchema = mongoose.Schema({
-  username: {
-    type: String,
-    required: [true, "Please enter a username"],
+const rescueSchema =new mongoose.Schema({
+  rescuedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Volunteer",
+    required: false,
   },
-  contact: {
-    type: String,
-    required: [true, "Please enter a phone number"],
+  rescueinfoBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: false,
   },
   location: {
     type: String,
     required: [true, "Please enter the location"],
   },
-  rescuedate: {
+  rescuedate:{
     type: Date,
     default:Date.now,
-    required: [true, "Please enter the rescue data"],
   },
-  time: {
+  rescuetime:{
     type: Date,
-    default: Date.now, // Default to the current timestamp
+    default: Date.now, 
   },
   description: {
     type: String,
     required: [true, "Please enter the description"],
   },
+  status: {
+    type: String,
+    enum: ["Pending", "In Progress", "Completed", "Cancelled"],
+    default: "Pending",
+  },
+  image:{
+    type:String,
+  }
+},{
+  timestamps:true
 });
 
 const Rescue = mongoose.model('Rescue', rescueSchema);

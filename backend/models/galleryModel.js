@@ -16,14 +16,9 @@ const gallerySchema =new mongoose.Schema({
         default: null,
         maxlength: [500, "Description cannot exceed 500 characters"],
     },
-    category: {
-        type: String,
-        default: "General", 
-    },
     uploadedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Admin",
-        required: false,
     },
 }, { timestamps: true });
 

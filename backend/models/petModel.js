@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
 
 const petSchema = mongoose.Schema({
-    image: {
-        type: String,
-        required: [true, "Please upload an image"]
-    },
     name: {
         type: String,
         required: [true, "Please enter the name"],
         minlength: [2, "Name must be at least 2 characters long"],
         maxlength: [50, "Name cannot exceed 50 characters"],
+    },
+    image: {
+        type: String,
+        required: [true, "Please upload an image"]
     },
     breed: {
         type: String,
@@ -27,8 +27,12 @@ const petSchema = mongoose.Schema({
         default: "Unknown",
     },
     vaccinated: {
-        type: Boolean,
-        default: false, 
+         type:mongoose.Schema.Types.ObjectId,
+         ref:'Vaccination',
+    },
+    veterinary:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Veterinary',
     },
     adoptionStatus: {
         type: String,
