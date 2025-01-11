@@ -1,7 +1,6 @@
-const { type } = require('@testing-library/user-event/dist/type');
 const mongoose = require('mongoose');
 
-const volunteerSchema = mongoose.Schema({
+const volunteerSchema =new mongoose.Schema({
     username:{
         type:String,
         required:[true, "Plaease enter a username"]
@@ -20,9 +19,17 @@ const volunteerSchema = mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["Pending", "Accepted", "Rejected"], // Allow only these values
-        default: "Pending", // Set the default status to 'Pending'
+        enum: ["Pending", "Accepted", "Rejected"], 
+        default: "Pending", 
     },
+    worksassigned:[
+        {
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'Work'
+        }
+    ]
+},{
+    timestamps:true
 })
 
 const Volunteer = mongoose.model('Volunteer', volunteerSchema);

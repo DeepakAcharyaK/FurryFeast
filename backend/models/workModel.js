@@ -1,25 +1,38 @@
 const mongoose = require('mongoose');
 
-const workSchema = mongoose.Schema({
-    taskname:{
-        type:String,
-        required:[true, "Plaease enter a taskname"]
+const workSchema =new mongoose.Schema({
+  taskname: [
+    {
+      type: String,
+      required: [true, "Please enter a task name"],
     },
-    volunteer:{
-        type:Number,
-        required:[true, "Please enter a number of volunteer"]
-    },
-    deadline:{
-        type:Date,
-        default:Date.now,
-        required:[true, "Plaese enter the deadline data"]
-    },
-    status: {
-        type: String,
-        enum: ["Pending", "Accepted", "Rejected"],
-        default: "Pending",
-    },
-})
+  ],
+  description: {
+    type: String, 
+    required: [true, "Please provide a task description"],
+  },
+  volunteer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Volunteer',
+    required: [true, "Please assign a volunteer"],
+  },
+  assignedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Admin', 
+    required: [true, "Please specify who assigned the task"],
+  },
+  deadline: {
+    type: Date,
+    required: [true, "Please enter the deadline"],
+  },
+  status: {
+    type: String,
+    enum: ["Pending", "In Progress", "Completed", "Rejected"], 
+    default: "Pending",
+  }
+},{
+    timestamps:true
+});
 
 const Work = mongoose.model('Work', workSchema);
 
