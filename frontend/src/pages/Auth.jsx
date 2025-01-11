@@ -11,21 +11,21 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Auth = ({ open, onClose }) => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
+    username:"",
     email: "",
     password: "",
     confirmPassword: "",
   });
-
   const [errors, setErrors] = useState({}); // Store field errors
 
   // Input change handler
   const handleInputChange = (e) => {
-    console.log(e.target)
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
@@ -49,34 +49,38 @@ const Auth = ({ open, onClose }) => {
   // Form submission handler
   const handleSubmit = async () => {
     if (validateFields()) {
-      if (isLogin) {
-        console.log("Login data:", formData);
-
-        try {
-          const response = await fetch('http://localhost:3000/login',{
-            method:'POST',
-            headers:{
-              'Content-Type':'application/json'
-            },
-            body:formData
-          })
-
-          if (response.ok) {
-            navigate('/settings')
+      try {
+        if (isLogin) {
+          console.log("Login data:", formData);
+          const response = await axios.post("http://localhost:3000/login", {
+            email: formData.email,
+            password: formData.password,
+          });
+          if (response.status === 200) {
+            console.log("Login successful");
+            navigate("/settings");
           }
-
-        } catch (error) {
-          console.log('Login ERROR', error)
+        } else {
+          console.log("Signup data:", formData);
+          const response = await axios.post("http://localhost:3000/user/signup", {
+            username:formData.username,
+            email: formData.email,
+            password: formData.password,
+          });
+          if (response.status === 201) {
+            console.log("Signup successful");
+          }
         }
-      } else {
-        console.log("Signup data:", formData);
+        // Reset form data and close dialog
+        setFormData({
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+        onClose();
+      } catch (error) {
+        console.error("Error:", error.response?.data || error.message);
       }
-      setFormData({
-        email: "",
-        password: "",
-        confirmPassword: "",
-      })
-      onClose();
     }
   };
 
@@ -108,6 +112,16 @@ const Auth = ({ open, onClose }) => {
             marginTop: 2,
           }}
         >
+          {!isLogin && (
+            <TextField
+              label="username"
+              name="username"
+              type="text"
+              value={formData.username}
+              onChange={handleInputChange}
+              fullWidth
+            />
+          )}
           {/* Email Field */}
           <TextField
             label="Email"

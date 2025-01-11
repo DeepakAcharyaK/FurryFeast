@@ -2,10 +2,10 @@ const mongoose=require('mongoose')
 
 const connectDB=async()=>{
     try {
-        await mongoose.connect("mongodb://127.0.0.1:27017/FurryFeast")
+        await mongoose.connect(`${process.env.MONGODB_URI}/${process.env.DB_NAME}`)
         console.log('Database connected successfully...')
     } catch (error) {
-        console.log("Error in connecting database!!!")
+        console.log("Error in connecting database!!!",error)
     }
 }
 

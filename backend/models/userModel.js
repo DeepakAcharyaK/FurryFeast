@@ -22,11 +22,9 @@ const userSchema =new mongoose.Schema({
       },
       contactNumber: {
         type: String,
-        required: [true, "Please enter a contact number"],
       },
       address: {
         type: String,
-        required: [true, "Please provide an address"],
       },
       profilePicture: {
         type: String,
