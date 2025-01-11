@@ -52,7 +52,7 @@ const Auth = ({ open, onClose }) => {
       try {
         if (isLogin) {
           console.log("Login data:", formData);
-          const response = await axios.post("http://localhost:3000/login", {
+          const response = await axios.post("http://localhost:3000/user/login", {
             email: formData.email,
             password: formData.password,
           });
