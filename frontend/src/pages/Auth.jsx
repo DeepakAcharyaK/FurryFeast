@@ -13,16 +13,16 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const Auth = ({ open, onClose }) => {
+const Auth = ({ open, onClose, onLoginSuccess }) => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
-    username:"",
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
-  const [errors, setErrors] = useState({}); // Store field errors
+  const [errors, setErrors] = useState({});
 
   // Input change handler
   const handleInputChange = (e) => {
@@ -51,33 +51,36 @@ const Auth = ({ open, onClose }) => {
     if (validateFields()) {
       try {
         if (isLogin) {
-          console.log("Login data:", formData);
-          const response = await axios.post("http://localhost:3000/user/login", {
-            email: formData.email,
-            password: formData.password,
-          });
+          const response = await axios.post(
+            "http://localhost:3000/user/login",
+            {
+              email: formData.email,
+              password: formData.password,
+            },
+            { withCredentials: true }
+          );
           if (response.status === 200) {
             console.log("Login successful");
-            navigate("/settings");
+            onLoginSuccess();
+            onClose();
           }
         } else {
-          console.log("Signup data:", formData);
           const response = await axios.post("http://localhost:3000/user/signup", {
-            username:formData.username,
+            username: formData.username,
             email: formData.email,
             password: formData.password,
           });
           if (response.status === 201) {
             console.log("Signup successful");
+            setIsLogin(true)
           }
         }
-        // Reset form data and close dialog
         setFormData({
+          username: "",
           email: "",
           password: "",
           confirmPassword: "",
         });
-        onClose();
       } catch (error) {
         console.error("Error:", error.response?.data || error.message);
       }
@@ -114,7 +117,7 @@ const Auth = ({ open, onClose }) => {
         >
           {!isLogin && (
             <TextField
-              label="username"
+              label="Username"
               name="username"
               type="text"
               value={formData.username}
@@ -122,7 +125,6 @@ const Auth = ({ open, onClose }) => {
               fullWidth
             />
           )}
-          {/* Email Field */}
           <TextField
             label="Email"
             name="email"
@@ -133,7 +135,6 @@ const Auth = ({ open, onClose }) => {
             helperText={errors.email}
             fullWidth
           />
-          {/* Password Field */}
           <TextField
             label="Password"
             name="password"
@@ -144,7 +145,6 @@ const Auth = ({ open, onClose }) => {
             helperText={errors.password}
             fullWidth
           />
-          {/* Confirm Password Field (Only for Signup) */}
           {!isLogin && (
             <TextField
               label="Confirm Password"
@@ -157,7 +157,6 @@ const Auth = ({ open, onClose }) => {
               fullWidth
             />
           )}
-          {/* Submit Button */}
           <Button
             variant="contained"
             color="primary"
@@ -166,7 +165,6 @@ const Auth = ({ open, onClose }) => {
           >
             {isLogin ? "Login" : "Sign Up"}
           </Button>
-          {/* Toggle Between Login and Signup */}
           <Typography
             variant="body2"
             sx={{ textAlign: "center", marginTop: 1, cursor: "pointer" }}
@@ -186,3 +184,4 @@ const Auth = ({ open, onClose }) => {
 };
 
 export default Auth;
+
