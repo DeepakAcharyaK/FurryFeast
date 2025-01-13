@@ -1,31 +1,31 @@
-const User=require('../models/userModel');
-const Gallery=require('../models/galleryModel');
+const User = require('../models/userModel');
+const Gallery = require('../models/galleryModel');
 const bcrypt = require('bcrypt');
-const jwt=require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 const signup = async (req, res) => {
-    const { username, email, password } = req.body;
-  
-    try {
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-        return res.status(400).json({ message: 'Email already exists' });
-      }
+  const { username, email, password } = req.body;
 
-      const hashedPassword = await bcrypt.hash(password,Number(process.env.SALT_ROUND));
-  
-      const newUser = await User.create({
-        username,
-        email,
-        password: hashedPassword,
-      });
-  
-      console.log(newUser);
-      res.status(201).json({ message: 'User registered successfully' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Server error' });
+  try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email already exists' });
     }
+
+    const hashedPassword = await bcrypt.hash(password, Number(process.env.SALT_ROUND));
+
+    const newUser = await User.create({
+      username,
+      email,
+      password: hashedPassword,
+    });
+
+    console.log(newUser);
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
 const login = async (req, res) => {
@@ -43,25 +43,24 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { 
-        id: user._id, 
-        email: user.email 
+      {
+        id: user._id,
+        email: user.email
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    // Set the token in the cookie
-    res.cookie("token", token, {
-      httpOnly: true, 
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 3600000, // 1 hour
-    });
-
-    res.status(200).json({ 
-      message: "Login successful",
-      user:user
-    });
+    res.status(200)
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 3600000,
+      })
+      .json({
+        message: "Login successful",
+        user: user
+      });
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).json({ message: "Server error" });
@@ -76,9 +75,9 @@ const gallery = async (req, res) => {
       return res.status(404).json({ message: 'No gallery entries found for this user.' });
     }
 
-    res.status(200).json({ 
-      message: 'Gallery entries fetched successfully.', 
-      gallery: galleryEntries 
+    res.status(200).json({
+      message: 'Gallery entries fetched successfully.',
+      gallery: galleryEntries
     });
 
     res.send('Done')
@@ -89,8 +88,8 @@ const gallery = async (req, res) => {
 };
 
 
-module.exports={
-    signup,login,gallery
+module.exports = {
+  signup, login, gallery
 }
 
 
