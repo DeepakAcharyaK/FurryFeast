@@ -6,6 +6,8 @@ import { HiMenuAlt3 } from "react-icons/hi";
 import { CiLight } from "react-icons/ci";
 import { MdDarkMode } from "react-icons/md";
 import { FaUserCircle } from "react-icons/fa"; // Profile icon
+import { useNavigate } from "react-router-dom";
+
 
 const Navbar = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -30,7 +32,13 @@ const Navbar = () => {
   };
 
 
-  console.log(isAuthenticated)
+  const navigate=useNavigate();
+
+  const handlegallery=()=>{
+    console.log('gallery clicked')
+    const location=(isAuthenticated)?`/viewgallery`:`#gallery`
+    navigate(location)
+  }
 
   return (
     <header>
@@ -40,7 +48,7 @@ const Navbar = () => {
       <nav>
         <div className="menu">
           <a href="#works">Work</a>
-          <a href="#gallery">Gallery</a>
+          <a onClick={handlegallery} href="">Gallery</a>
           <a href="#veterinery">Veterinery</a>
           {/* Additional menu items if authenticated */}
           {isAuthenticated && (

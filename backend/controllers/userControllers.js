@@ -1,4 +1,5 @@
 const User = require('../models/userModel');
+const Donation = require('../models/donationModel');
 const Gallery = require('../models/galleryModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -79,17 +80,56 @@ const gallery = async (req, res) => {
       message: 'Gallery entries fetched successfully.',
       gallery: galleryEntries
     });
-
-    res.send('Done')
   } catch (error) {
     console.error('Error fetching gallery:', error);
     res.status(500).json({ message: 'An error occurred while fetching the gallery.' });
   }
 };
 
+const addDonation = async (req, res) => {
+  try {
+    const {donorname,email,contact,amount,currency,description,paymentReference} = req.body;
+
+    // Validate required fields
+    if (!donorname || !contact || !amount || !paymentReference) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide all required fields (donorname, contact, amount, description).",
+      });
+    }
+
+    // Create a new donation
+    const newDonation = new Donation({
+      donorname,
+      email,
+      contact,
+      amount,
+      currency: currency || "INR",
+      description,
+      paymentReference,
+    });
+
+    // Save the donation to the database
+    const savedDonation = await newDonation.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Donation added successfully.",
+      donation: savedDonation,
+    });
+  } catch (error) {
+    console.error("Error adding donation:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while adding the donation.",
+      error: error.message,
+    });
+  }
+};
+
 
 module.exports = {
-  signup, login, gallery
+  signup, login, gallery,addDonation
 }
 
 
