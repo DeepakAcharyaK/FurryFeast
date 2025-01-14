@@ -3,6 +3,7 @@ const Donation = require('../models/donationModel');
 const Gallery = require('../models/galleryModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Rescue = require('../models/rescueModel');
 
 const signup = async (req, res) => {
   const { username, email, password } = req.body;
@@ -88,7 +89,7 @@ const gallery = async (req, res) => {
 
 const addDonation = async (req, res) => {
   try {
-    const {donorname,email,contact,amount,currency,description,paymentReference} = req.body;
+    const { donorname, email, contact, amount, currency, description, paymentReference } = req.body;
 
     // Validate required fields
     if (!donorname || !contact || !amount || !paymentReference) {
@@ -127,9 +128,40 @@ const addDonation = async (req, res) => {
   }
 };
 
+const addRescue = async (req, res) => {
+  try {
+    const { rescuetitle, location, description } = req.body.formData
+
+    if(!rescuetitle || !location){
+      res.status(400).json({
+        message:'missing'
+      })
+    }
+
+    const addedrescueinfo =await Rescue.create({
+      rescuetitle,
+      location,
+      description
+    })
+
+    res.status(200).json({
+      message: 'success',
+      data: addedrescueinfo
+    })
+
+    console.log(addedrescueinfo)
+  } catch (error) {
+    res.status(404).json({
+      message: 'failed',
+      error: error
+    })
+
+  }
+}
+
 
 module.exports = {
-  signup, login, gallery,addDonation
+  signup, login, gallery, addDonation, addRescue
 }
 
 

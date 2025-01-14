@@ -18,15 +18,15 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<Landing/>}/>
-          <Route path='/settings' element={<Settings/>}/>
           <Route path='/adddonations' element={<AddDonations/>}/>
+          <Route path='/viewgallery' element={<ViewGallery/>}/>
           <Route path='/addresues' element={<AddResues/>}/>
           {/* <Route path='/managepetrequest' element={<ManagePetRequest/>}/> */}
           <Route path='/viewadoptpets' element={<ViewAdoptPets/>}/>
-          <Route path='/viewgallery' element={<ViewGallery/>}/>
           {/* <Route path='/viewvaccination' element={<ViewVaccination/>}/> */}
           {/* <Route path='/viewveterinary' element={<ViewVeterinary/>}/> */}
           <Route path='/viewworks' element={<ViewWorks/>}/>
+          {/* <Route path='/settings' element={<Settings/>}/> */}
         </Routes>
       </BrowserRouter>
     </>

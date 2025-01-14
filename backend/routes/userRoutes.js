@@ -11,7 +11,7 @@ router.get('/gallery',userControllers.gallery)
 
 router.post('/adddonation',userControllers.addDonation)
 
-// router.post('/:id/addrescue',userControllers.addrescue)
+router.post('/addrescue',userControllers.addRescue)
 
 // router.get('/:id/adopt',userControllers.adopt)
 

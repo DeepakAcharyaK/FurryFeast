@@ -48,22 +48,22 @@ const AddDonations = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
       console.log("Donation form Data:", formData);
 
-      const response=axios.post('http://localhost:3000/user/adddonation',{
+      const response=await axios.post('http://localhost:3000/user/adddonation',{
         donorname: formData.donorname,
-        email: "",
-        contact: "",
-        amount: "",
-        donationdate: "",
-        description: "",
-        paymentReference: "",
+        email:formData.email,
+        contact:formData.contact,
+        amount:formData.amount,
+        donationdate:formData.donationdate,
+        description:formData.description,
+        paymentReference:formData.paymentReference,
       })
 
-      console.log(response)
+      console.log(response.data)
 
       // Reset form
       setFormData({

@@ -1,31 +1,26 @@
 const mongoose = require('mongoose');
 
 const rescueSchema =new mongoose.Schema({
-  rescuedBy: {
+  rescuedby: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Volunteer",
     required: false,
   },
-  rescueinfoBy: {
+  rescueinfoby: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: false,
+  },
+  rescuetitle:{
+    type:String,
+    required:[true,'Please enter the rescue title']
   },
   location: {
     type: String,
     required: [true, "Please enter the location"],
   },
-  rescuedate:{
-    type: Date,
-    default:Date.now,
-  },
-  rescuetime:{
-    type: Date,
-    default: Date.now, 
-  },
   description: {
     type: String,
-    required: [true, "Please enter the description"],
   },
   status: {
     type: String,

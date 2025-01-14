@@ -1,20 +1,47 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Typography, TextField, Button, Grid, Card, CardContent, MenuItem } from "@mui/material";
+import axios from "axios";
+import Navbar from "../components/Navbar";
 
 const AddRescues = () => {
-  const handleSubmit = (event) => {
+
+  const [formData, setformData] = useState({
+    rescuetitle: "",
+    location: "",
+    description: ""
+  })
+
+  const handleOnchange = (e) => {
+    const { name, value } = e.target
+    setformData({ ...formData, [name]: value })
+    console.log(formData)
+  }
+
+  const handleSubmit = async (e) => {
     event.preventDefault();
-    console.log("Rescue Submitted");
+
+    const response = await axios.post('http://localhost:3000/user/addrescue', {
+      formData
+    })
+
+    console.log(response)
+
+    setformData({
+      rescuetitle: "",
+      location: "",
+      description: ""
+    })
+
   };
 
   return (
+    <>
+      <Navbar/>
     <Box
       sx={{
         display: "flex",
-        justifyContent: "center",
+        justifyContent:'center',
         alignItems: "center",
-        minHeight: "100vh",
-        backgroundColor: "#f8f9fb",
         padding: 3,
       }}
     >
@@ -26,7 +53,7 @@ const AddRescues = () => {
             textAlign="center"
             sx={{ marginBottom: 3, color: "#333" }}
           >
-            Add Rescue
+            Give Rescue Information !!
           </Typography>
           <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
@@ -34,7 +61,9 @@ const AddRescues = () => {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Rescue Title"
+                  onChange={handleOnchange}
+                  name="rescuetitle"
+                  label="rescuetitle"
                   placeholder="Enter rescue title"
                   variant="outlined"
                   required
@@ -45,52 +74,10 @@ const AddRescues = () => {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Location"
+                  label="location"
+                  name="location"
+                  onChange={handleOnchange}
                   placeholder="Enter rescue location"
-                  variant="outlined"
-                  required
-                />
-              </Grid>
-
-              {/* Rescue Type */}
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  select
-                  label="Rescue Type"
-                  variant="outlined"
-                  required
-                >
-                  <MenuItem value="Animal Rescue">Animal Rescue</MenuItem>
-                  <MenuItem value="Natural Disaster">Natural Disaster</MenuItem>
-                  <MenuItem value="Medical Emergency">Medical Emergency</MenuItem>
-                  <MenuItem value="Other">Other</MenuItem>
-                </TextField>
-              </Grid>
-
-              {/* Date */}
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  type="date"
-                  label="Rescue Date"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  variant="outlined"
-                  required
-                />
-              </Grid>
-
-              {/* Time */}
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  type="time"
-                  label="Rescue Time"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
                   variant="outlined"
                   required
                 />
@@ -100,12 +87,13 @@ const AddRescues = () => {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Description"
+                  label="description"
+                  name="description"
+                  onChange={handleOnchange}
                   placeholder="Enter a detailed description"
                   variant="outlined"
                   multiline
                   rows={4}
-                  required
                 />
               </Grid>
 
@@ -123,7 +111,7 @@ const AddRescues = () => {
                     },
                   }}
                 >
-                  Submit Rescue
+                  Add Rescue
                 </Button>
               </Grid>
             </Grid>
@@ -131,6 +119,7 @@ const AddRescues = () => {
         </CardContent>
       </Card>
     </Box>
+    </>
   );
 };
 
