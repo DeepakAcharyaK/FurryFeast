@@ -1,145 +1,203 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Box,
   Typography,
   TextField,
   Avatar,
   Button,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
+  CircularProgress,
 } from "@mui/material";
 import Navbar from "../components/Navbar";
 
 const ProfileSettings = () => {
-  return (
-    <>
-    <Navbar/>
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    contactNumber: "",
+    address: "",
+    profilePicture: "",
+  });
 
-    <Box sx={{
-      minWidth:'100%',
-      minHeight:'100%',
-      display:'flex',
-      alignItems:'center',
-      justifyContent:'center'
-    }}>
-    <Box
-      maxWidth={'md'}
-      sx={{
-        display: "flex",
-        minHeight: "100vh",
-        padding: 4,
-      }}
-    >
-      {/* Sidebar */}
+  useEffect(() => {
+    // Fetch user details on page load
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get("/api/users/me");
+        setUser(response.data);
+        setFormData({
+          username: response.data.username,
+          email: response.data.email,
+          password: "", // Password left empty for security
+          contactNumber: response.data.contactNumber || "",
+          address: response.data.address || "",
+          profilePicture: response.data.profilePicture,
+        });
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put("/api/users/me", formData);
+      alert("Profile updated successfully!");
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      alert("Failed to update profile.");
+    }
+  };
+
+  if (loading) {
+    return (
       <Box
         sx={{
-          width: 250,
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  return (
+    <>
+      <Navbar />
+      <Box
+        sx={{
+          minWidth: "100%",
+          minHeight: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#f5f5f5",
           padding: 2,
         }}
       >
-        <Typography variant="h6" fontWeight="bold" sx={{ marginBottom: 2 }}>
-          Settings
-        </Typography>
-        <List>
-          <ListItem button>
-            <ListItemText primary="Public profile" />
-          </ListItem>
-          <Divider />
-          <ListItem button>
-            <ListItemText primary="Account settings" />
-          </ListItem>
-          <Divider />
-          <ListItem button>
-            <ListItemText primary="Notifications" />
-          </ListItem>
-          <Divider />
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: "600px",
+            backgroundColor: "white",
+            borderRadius: 2,
+            padding: 4,
+            boxShadow: 2,
+          }}
+        >
+          <Typography variant="h5" fontWeight="bold" sx={{ marginBottom: 4 }}>
+            Public Profile
+          </Typography>
 
-        </List>
-      </Box>
+          {/* Profile Picture */}
+          <Box sx={{ display: "flex", alignItems: "center", marginBottom: 4 }}>
+            <Avatar
+              sx={{ width: 100, height: 100, marginRight: 2, boxShadow: 2 }}
+              src={formData.profilePicture}
+            />
+            <Box>
+              <Button
+                variant="contained"
+                sx={{ marginBottom: 1 }}
+                component="label"
+              >
+                Change Picture
+                <input
+                  type="file"
+                  hidden
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    setFormData((prev) => ({
+                      ...prev,
+                      profilePicture: URL.createObjectURL(file),
+                    }));
+                  }}
+                />
+              </Button>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    profilePicture: "https://example.com/default-profile.png",
+                  }))
+                }
+              >
+                Delete Picture
+              </Button>
+            </Box>
+          </Box>
 
-      {/* Profile Form */}
-      <Box
-        sx={{
-          flex: 1,
-          backgroundColor: "white",
-          marginLeft: 4,
-          borderRadius: 2,
-          padding: 4,
-          boxShadow: 1,
-        }}
-      >
-        <Typography variant="h5" fontWeight="bold" sx={{ marginBottom: 4 }}>
-          Public profile
-        </Typography>
-        {/* Profile Picture */}
-        <Box sx={{ display: "flex", alignItems: "center", marginBottom: 4 }}>
-          <Avatar
-            sx={{
-              width: 100,
-              height: 100,
-              marginRight: 2,
-              boxShadow: 2,
-            }}
-            src="https://via.placeholder.com/100"
-          />
-          <Box sx={{display:'flex',flexDirection:'column'}}>
-            <Button variant="contained" sx={{ marginBottom: 1 }}>
-              Change picture
-            </Button>
-            <Button variant="outlined" color="error">
-              Delete picture
+          {/* Profile Form */}
+          <Box
+            component="form"
+            onSubmit={handleFormSubmit}
+            sx={{ "& .MuiTextField-root": { marginBottom: 2 } }}
+          >
+            <TextField
+              fullWidth
+              name="username"
+              label="Username"
+              value={formData.username}
+              onChange={handleInputChange}
+              variant="outlined"
+            />
+            <TextField
+              fullWidth
+              name="email"
+              label="Email"
+              value={formData.email}
+              onChange={handleInputChange}
+              variant="outlined"
+            />
+            <TextField
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              variant="outlined"
+            />
+            <TextField
+              fullWidth
+              name="contactNumber"
+              label="Contact Number"
+              value={formData.contactNumber}
+              onChange={handleInputChange}
+              variant="outlined"
+            />
+            <TextField
+              fullWidth
+              name="address"
+              label="Address"
+              value={formData.address}
+              onChange={handleInputChange}
+              variant="outlined"
+            />
+            <Button variant="contained" type="submit">
+              Save Changes
             </Button>
           </Box>
         </Box>
-
-        {/* Profile Form Fields */}
-        <Box
-          component="form"
-          sx={{
-            "& .MuiTextField-root": { marginBottom: 2 },
-            maxWidth: 600,
-          }}
-          noValidate
-          autoComplete="off"
-        >
-          <TextField
-            fullWidth
-            label="First name"
-            defaultValue="Ildiko"
-            variant="outlined"
-          />
-          <TextField
-            fullWidth
-            label="Last name"
-            defaultValue="Gaspar"
-            variant="outlined"
-          />
-          <TextField
-            fullWidth
-            label="Location"
-            defaultValue="emailis@privato.com"
-            variant="outlined"
-          />
-          <TextField
-            fullWidth
-            label="Profession"
-            defaultValue="UI/UX Designer"
-            variant="outlined"
-          />
-          <TextField
-            fullWidth
-            label="Bio"
-            defaultValue="Open-Source designer @ UI Design Daily"
-            variant="outlined"
-            multiline
-            rows={3}
-          />
-        </Box>
       </Box>
-    </Box>
-    </Box>
     </>
   );
 };

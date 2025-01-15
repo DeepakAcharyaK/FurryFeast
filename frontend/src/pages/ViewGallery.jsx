@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import {
   Container,
   Typography,
-  Grid,
   Card,
   CardMedia,
   CardContent,
 } from "@mui/material";
+import Masonry from "@mui/lab/Masonry"; // Import Masonry
 import Navbar from "../components/Navbar";
 
 const ViewGallery = () => {
@@ -46,23 +46,18 @@ const ViewGallery = () => {
       <Typography variant="h4" my={4} textAlign="center">
         View Gallery
       </Typography>
-      <Grid container spacing={4}>
+      <Masonry columns={{ xs: 1, sm: 2, md: 3 }} spacing={2}>
         {galleryData.map((item) => (
-          <Grid item xs={12} sm={6} md={4} key={item._id}>
-            <Card>
-              <CardMedia
-                component="img"
-                height="180"
-                image={item.image} 
-              />
-              <CardContent>
-                <Typography variant="h6">{item.imageTitle}</Typography>
-                <Typography variant="body2">{item.description}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+          <Card key={item._id} sx={{ borderRadius: 2, boxShadow: 3 }}>
+            <CardMedia
+              component="img"
+              image={item.image}
+              alt={item.description}
+              sx={{ borderRadius: 2 }}
+            />
+          </Card>
         ))}
-      </Grid>
+      </Masonry>
     </Container>
   );
 };

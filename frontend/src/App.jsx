@@ -26,7 +26,7 @@ function App() {
           {/* <Route path='/viewvaccination' element={<ViewVaccination/>}/> */}
           {/* <Route path='/viewveterinary' element={<ViewVeterinary/>}/> */}
           <Route path='/viewworks' element={<ViewWorks/>}/>
-          {/* <Route path='/settings' element={<Settings/>}/> */}
+          <Route path='/settings' element={<Settings/>}/>
         </Routes>
       </BrowserRouter>
     </>
