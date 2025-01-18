@@ -41,8 +41,9 @@ const ViewGallery = () => {
   }
 
   return (
+      <>
+        <Navbar />
     <Container maxWidth="lg">
-      <Navbar />
       <Typography variant="h4" my={4} textAlign="center">
         View Gallery
       </Typography>
@@ -59,6 +60,7 @@ const ViewGallery = () => {
         ))}
       </Masonry>
     </Container>
+      </>
   );
 };
 

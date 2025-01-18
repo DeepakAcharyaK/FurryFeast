@@ -1,118 +1,111 @@
-import React, { useState } from "react";
-import {
-  Container,
-  Grid,
-  Card,
-  CardMedia,
-  CardContent,
-  CardActions,
-  Button,
-  Typography,
-  Modal,
-  Box,
-} from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Container, Grid, Card, CardMedia, CardContent, Typography, } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
-const petsData = [
-  { id: 1, name: "Buddy", breed: "Golden Retriever", age: 3, image: "/pet1.jpg", description: "Friendly and energetic, loves playing fetch." },
-  { id: 2, name: "Luna", breed: "Siberian Husky", age: 2, image: "/pet2.jpg", description: "Very intelligent and loves the snow." },
-];
-
-const PetDetailsModal = ({ open, pet, handleClose }) => (
-  <Modal open={open} onClose={handleClose}>
-    <Box
-      sx={{
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        width: 400,
-        bgcolor: "background.paper",
-        borderRadius: 2,
-        boxShadow: 24,
-        p: 4,
-      }}
-    >
-      {pet ? (
-        <>
-          <Typography variant="h5" gutterBottom>
-            {pet.name}
-          </Typography>
-          <img src={pet.image} alt={pet.name} style={{ width: "100%", borderRadius: "8px" }} />
-          <Typography variant="body1" mt={2}>
-            <strong>Breed:</strong> {pet.breed}
-          </Typography>
-          <Typography variant="body1" mt={1}>
-            <strong>Age:</strong> {pet.age} years
-          </Typography>
-          <Typography variant="body2" mt={1}>
-            <strong>Description:</strong> {pet.description}
-          </Typography>
-        </>
-      ) : (
-        <Typography variant="body1">No pet details available.</Typography>
-      )}
-    </Box>
-  </Modal>
-);
+import Navbar from "../components/Navbar";
 
 const ViewAdoptPets = () => {
-  const [selectedPet, setSelectedPet] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [petsData, setPetsData] = useState([]);
+  const navigate = useNavigate();
 
-  const handleViewDetails = (pet) => {
-    setSelectedPet(pet);
-    setIsModalOpen(true);
-  };
+  useEffect(() => {
+    const fetchPets = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/user/viewpets");
+        console.log(response.data);
+        setPetsData(response.data);
+      } catch (error) {
+        console.error("Failed to fetch pets:", error);
+      }
+    };
+    fetchPets();
+  }, []);
 
-  const handleCloseModal = () => {
-    setSelectedPet(null);
-    setIsModalOpen(false);
-  };
-
-  const handleRequestAdopt = async (petId) => {
-    
+  const handleCardClick = (id) => {
+    navigate(`/petdetails/${id}`);
   };
 
   return (
-    <Container maxWidth="lg">
-      <Typography variant="h4" my={4} textAlign="center">
-        View Adoptable Pets
-      </Typography>
-      <Grid container spacing={4}>
-        {petsData.map((pet) => (
-          <Grid item xs={12} sm={6} md={4} key={pet.id}>
-            <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
-              <CardMedia component="img" height="200" image={pet.image} alt={pet.name} />
-              <CardContent>
-                <Typography variant="h6">{pet.name}</Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Breed: {pet.breed}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Age: {pet.age} years
-                </Typography>
-              </CardContent>
-              <CardActions sx={{ flexDirection: "column", gap: 1 }}>
-                <Button variant="contained" color="primary" fullWidth onClick={() => handleViewDetails(pet)}>
-                  View More Details
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  fullWidth
-                  onClick={() => handleRequestAdopt(pet.id)}
-                >
-                  Request Adopt
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-      <PetDetailsModal open={isModalOpen} pet={selectedPet} handleClose={handleCloseModal} />
-    </Container>
+    <>
+      <Navbar />
+      <Container maxWidth="lg" sx={{marginBottom:'10px'}}>
+        <Typography variant="h3" my={4} fontWeight={700} textAlign="center">
+          Find & adopt your pet dog
+        </Typography>
+        <Typography variant="h6" my={4} textAlign="center" color="gray">
+          Search through our curated list of rescued dogs available for adoption and find the one that seems most compatible to you and your lifestyle.
+        </Typography>
+        <Grid container spacing={4}>
+          {petsData.length > 0 ? (
+            petsData.map((pet) => (
+              <Grid item xs={12} sm={6} md={4} key={pet._id}>
+                <Card onClick={() => handleCardClick(pet._id)} sx={{borderRadius:'25px',cursor:'pointer',boxShadow:'0 8px 32px 0 rgba(113, 113, 114, 0.37)'}}>
+                  <CardMedia component="img" height="250" image={pet.image} />
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom fontWeight={600}>
+                      {pet.name}
+                    </Typography>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" color="textSecondary">
+                          Breed:
+                        </Typography>
+                        <Typography variant="body2">{pet.breed}</Typography>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" color="textSecondary">
+                          Age:
+                        </Typography>
+                        <Typography variant="body2">{pet.age}</Typography>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" color="textSecondary">
+                          Gender:
+                        </Typography>
+                        <Typography variant="body2">{pet.gender}</Typography>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" color="textSecondary">
+                          Status:
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          style={{
+                            backgroundColor:
+                              pet.adoptionStatus === 'Adopted'
+                                ? '#ffcdd2  '
+                                : pet.adoptionStatus === 'Pending'
+                                  ? '#fff9c4'
+                                  : '#c8e6c9',
+                            color:
+                              pet.adoptionStatus === 'Adopted'
+                                ? '#b71c1c'
+                                : pet.adoptionStatus === 'Pending'
+                                  ? '#f57f17'
+                                  : '#2e7d32',
+                            padding: '2px 8px',
+                            borderRadius: '8px',
+                          }}
+                        >
+                          {pet.adoptionStatus}
+                        </Typography>
+                      </div>
+                    </div>
+                  </CardContent>
+
+                </Card>
+              </Grid>
+            ))
+          ) : (
+            <Typography variant="body1" color="textSecondary">
+              No pets available for adoption at the moment.
+            </Typography>
+          )}
+        </Grid>
+      </Container>
+    </>
   );
+
 };
 
 export default ViewAdoptPets;

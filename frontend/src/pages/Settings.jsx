@@ -1,18 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  Box,
-  Typography,
-  TextField,
-  Avatar,
-  Button,
-  CircularProgress,
-} from "@mui/material";
+import {Box,Typography,TextField,Avatar,Button,CircularProgress,} from "@mui/material";
 import Navbar from "../components/Navbar";
 
 const ProfileSettings = () => {
-  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -26,12 +19,19 @@ const ProfileSettings = () => {
     // Fetch user details on page load
     const fetchUserData = async () => {
       try {
-        const response = await axios.get("/api/users/me");
+        const response = await axios.get("http://localhost:3000/user/getuserdetails", {
+          headers: {
+            id: '6782b919b060d032200aa2ce', 
+          },
+        });
+        console.log(response)
+        
         setUser(response.data);
+
         setFormData({
           username: response.data.username,
           email: response.data.email,
-          password: "", // Password left empty for security
+          password: response.data.password, 
           contactNumber: response.data.contactNumber || "",
           address: response.data.address || "",
           profilePicture: response.data.profilePicture,
@@ -54,13 +54,20 @@ const ProfileSettings = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put("/api/users/me", formData);
+      const response = await axios.put("http://localhost:3000/user/updateuserdetails", {
+        formData, // Form data containing the updated fields
+        user: {
+          id: "6782b919b060d032200aa2ce", // User ID
+        },
+      });
+      console.log(response.data);
       alert("Profile updated successfully!");
     } catch (error) {
       console.error("Failed to update profile:", error);
       alert("Failed to update profile.");
     }
   };
+  
 
   if (loading) {
     return (

@@ -13,7 +13,21 @@ router.post('/adddonation',userControllers.addDonation)
 
 router.post('/addrescue',userControllers.addRescue)
 
-// router.get('/:id/adopt',userControllers.adopt)
+router.get('/getuserdetails',userControllers.getUserDetails)
+
+router.put('/updateuserdetails',userControllers.updateUserDetails)
+
+router.get('/viewpets',userControllers.viewpets)
+
+router.get('/pets/:id',userControllers.pets)
+
+router.get('/vaccinations/:id',userControllers.vaccination)
+
+router.get('/veterinary/:id',userControllers.veterinary)
+
+router.put('/pets/:id/adopt',userControllers.adopt)
+
+router.get('/viewveterinary',userControllers.viewveterinary)
 
 // router.get('/:id/works',userControllers.works)
 

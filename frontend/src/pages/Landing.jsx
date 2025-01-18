@@ -134,8 +134,8 @@ function Gallery(){
           const newElement = document.createElement("img");
           newElement.setAttribute('src','/images/dog.jpeg')
           newElement.style.position = "absolute";
-          newElement.style.width = "100px";
-          newElement.style.top = `${event.clientY}px`;
+          newElement.style.width = "200px";
+          newElement.style.top= `${event.clientY}px`;
           newElement.style.left = `${event.clientX}px`;
 
           // Append the new element to the target
@@ -144,7 +144,7 @@ function Gallery(){
           setTimeout(() => {
             newElement.remove()
           }, 5000);
-        }, 300)}
+        }, 200)}
         style={{ position: "relative", overflow: "hidden" }}
       >
 

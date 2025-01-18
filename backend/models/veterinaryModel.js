@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const veterinarySchema =new mongoose.Schema({
+  petId:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Pet'
+  },
   name: {
     type: String,
     required: [true, "Please enter the veterinarian's name"],

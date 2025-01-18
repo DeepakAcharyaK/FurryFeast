@@ -1,6 +1,9 @@
 const User = require('../models/userModel');
 const Donation = require('../models/donationModel');
 const Gallery = require('../models/galleryModel');
+const Vaccination = require('../models/vaccinationModel');
+const Veterinary = require('../models/veterinaryModel');
+const Pet = require('../models/petModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Rescue = require('../models/rescueModel');
@@ -100,7 +103,7 @@ const addDonation = async (req, res) => {
     }
 
     // Create a new donation
-    const newDonation = new Donation({
+    const newDonation =await Donation.create({
       donorname,
       email,
       contact,
@@ -159,9 +162,137 @@ const addRescue = async (req, res) => {
   }
 }
 
+const getUserDetails = async (req, res) => {
+  try {
+    const user = await User.findById(req.headers.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch user details" });
+  }
+};
+
+const updateUserDetails = async (req, res) => {
+  const { formData, user } = req.body; // Destructure formData and user
+
+  if (!user || !user.id) {
+    return res.status(400).json({ message: "User ID is required" });
+  }
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      user.id,
+      {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        contactNumber: formData.contactNumber,
+        address: formData.address,
+        profilePicture: formData.profilePicture,
+      },
+      { new: true, runValidators: true } // Ensure updated data is returned and validators run
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(updatedUser); // Return the updated user
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to update user details" });
+  }
+};
+
+const viewpets = async (req, res) => {
+  try {
+    // Ensure the Pet model is properly imported
+    const pets = await Pet.find({});
+    
+    // Check if pets are found
+    if (!pets || pets.length === 0) {
+      return res.status(404).json({ message: "No pets found" });
+    }
+
+    // Respond with the pets data
+    res.status(200).json(pets);
+  } catch (error) {
+    // Log the error for debugging
+    console.error("Error fetching pets:", error);
+
+    // Respond with an error message
+    res.status(500).json({ message: "Failed to fetch pets", error: error.message });
+  }
+};
+
+ const pets=async (req, res) => {
+  try {
+    const pet = await Pet.findById(req.params.id);
+    if (!pet) return res.status(404).json({ message: "Pet not found" });
+    res.json(pet);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+const veterinary=async (req, res) => {
+  try {
+    const vet = await Veterinary.find({ petId: req.params.id }).populate('petId').populate('reviews');
+    console.log(vet)
+    if (!vet) return res.status(404).json({ message: "Veterinary details not found" });
+    res.json(vet);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+const vaccination= async (req, res) => {
+  try {
+    const vaccinations = await Vaccination.find({ petId: req.params.id });
+    res.json(vaccinations);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+const adopt=async (req,res)=>{
+  const { id } = req.params;
+  const { adoptionStatus } = req.body;
+
+  try {
+    const pet = await Pet.findByIdAndUpdate(
+      id,
+      { adoptionStatus },
+      { new: true }
+    );
+
+    if (!pet) {
+      return res.status(404).json({ message: "Pet not found" });
+    }
+
+    res.status(200).json(pet);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to update pet status" });
+  }
+}
+
+const viewveterinary=async (req, res) => {
+  try {
+    const veterinarians = await Veterinary.find(); // 
+    res.status(200).json(veterinarians);
+  } catch (error) {
+    console.error("Error fetching veterinarians:", error.message);
+    res.status(500).json({ error: "Failed to fetch veterinarians" });
+  }
+};
+
 
 module.exports = {
-  signup, login, gallery, addDonation, addRescue
+  signup, login, gallery, addDonation, addRescue,getUserDetails,updateUserDetails,viewpets,pets,vaccination,veterinary,adopt,viewveterinary
 }
 
 
