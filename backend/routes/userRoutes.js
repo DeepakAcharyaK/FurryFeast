@@ -29,6 +29,8 @@ router.put('/pets/:id/adopt',userControllers.adopt)
 
 router.get('/viewveterinary',userControllers.viewveterinary)
 
+router.get('/logout',userControllers.logout)
+
 // router.get('/:id/works',userControllers.works)
 
 

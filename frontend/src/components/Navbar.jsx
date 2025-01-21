@@ -1,85 +1,102 @@
-import "../App.css";
 import "../stylesheets/Navbar.css";
 import React, { useEffect, useState } from "react";
-import Auth from "../pages/Auth";
 import { HiMenuAlt3 } from "react-icons/hi";
 import { CiLight } from "react-icons/ci";
 import { MdDarkMode } from "react-icons/md";
-import { FaUserCircle } from "react-icons/fa"; // Profile icon
-import { useNavigate } from "react-router-dom";
-
+import { FaUserCircle } from "react-icons/fa";
+import { Navigate, useNavigate } from "react-router-dom";
+import Sidebar from "./Sidebar";
 
 const Navbar = () => {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Track authentication
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const role = window.localStorage.getItem('role');
+  const isloggedin = window.localStorage.getItem('isloggedin');
 
-  // Toggle theme
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
   };
 
+  const handlelogout=()=>{
+    window.localStorage.removeItem('isloggedin');
+    window.localStorage.removeItem('role');
+    navigate("/")
+  }
+
   useEffect(() => {
-    document.body.className = theme; // Add theme to body for global styling
+    document.body.className = theme;
   }, [theme]);
 
-  // Handle logout
-  const handleLogout = () => {
-    setIsAuthenticated(false); // Update state
-    alert("Logged out successfully!"); // Optional
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
 
-  const navigate=useNavigate();
-
-  const handlegallery=()=>{
-    console.log('gallery clicked')
-    const location=(isAuthenticated)?`/viewgallery`:`#gallery`
-    navigate(location)
-  }
-
   return (
-    <header>
-      <div className="logo">
-        <img src="/images/logo.png" alt="Tonemaki logo" />
-      </div>
-      <nav>
-        <div className="menu">
-          <a href="#works">Work</a>
-          <a onClick={handlegallery} href="">Gallery</a>
-          <a href="#veterinery">Veterinery</a>
-          {/* Additional menu items if authenticated */}
-          {isAuthenticated && (
+    <header className="navbar">
+      <div className="navbar-content">
+        <div className="logo" onClick={() => navigate("/")}>
+          <img src="/images/logo.png" alt="Tonemaki Logo" />
+        </div>
+
+        {
+          isloggedin && role === 'customer' && (
             <>
-              <a href="#dashboard">Dashboard</a>
-              <a href="#settings">Settings</a>
-              <a href="#profile">Profile</a>
-              <a href="#notifications">Notifications</a>
-              <a href="#support">Support</a>
+              <menu>
+                <ul className={isMenuOpen ? "open" : ""}>
+                  <li onClick={()=>navigate("/login")}>Works</li>
+                  <li onClick={()=>navigate("/viewveterinary")}>Veterinary</li>
+                  <li onClick={()=>navigate("/viewgallery")}>Gallery</li>
+                  <li onClick={()=>navigate("/viewadoptpets")}>Adopt</li>
+                  <li onClick={()=>navigate("/addresues")}>Rescue</li>
+                  <li onClick={()=>navigate("/adddonations")}>Donation</li>
+                </ul>
+              </menu>
             </>
-          )}
+          )
+        }
+
+
+        <div className="actions">
+          <div className="theme-toggle" onClick={toggleTheme}>
+            {theme === "dark" ? (
+              <CiLight style={{ fontSize: "30px" }} />
+            ) : (
+              <MdDarkMode style={{ fontSize: "30px" }} />
+            )}
+          </div>
+
+          {
+            isloggedin === 'true' && (
+              <>
+                <div className="profile" style={{cursor:'pointer'}}>
+                  <FaUserCircle onClick={toggleSidebar}  style={{ fontSize: "30px", marginRight: "10px" }}/>
+                </div>
+                <button onClick={handlelogout} className="auth-button" style={{ backgroundColor: 'red' }}>Logout</button>
+              </>
+            )
+          }
+
+
+          {
+            !isloggedin &&(
+              <>
+                <button onClick={()=>navigate("/signup")} className="auth-button signup-button">Signup</button>
+                <button onClick={()=>navigate("/login")} className="auth-button">Login</button>
+              </>
+            )
+          }
         </div>
-        <HiMenuAlt3 className="hamburger" style={{ fontSize: "30px", display: "none" }} />
-      </nav>
-      <div className="actions">
-        <div className="theme" onClick={toggleTheme}>
-          {theme === "dark" ? <CiLight style={{ fontSize: "30px" }} /> : <MdDarkMode style={{ fontSize: "30px" }} />}
-        </div>
-        {isAuthenticated ? (
-          <>
-            <FaUserCircle style={{ fontSize: "30px", marginRight: "10px" }} />
-            <button className="logout-button" onClick={handleLogout}>
-              Logout
-            </button>
-          </>
-        ) : (
-          <button className="login-button" onClick={() => setDialogOpen(true)}>
-            Login
-          </button>
-        )}
-        <Auth open={dialogOpen} onClose={() => setDialogOpen(false)} onLoginSuccess={() => setIsAuthenticated(true)} />
+
+        <HiMenuAlt3
+          className="menu-icon"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        />
       </div>
     </header>
   );

@@ -36,6 +36,8 @@ const signup = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
 
+  console.log(req.body)
+
   try {
     const user = await User.findOne({ email });
     if (!user) {
@@ -50,21 +52,19 @@ const login = async (req, res) => {
     const token = jwt.sign(
       {
         id: user._id,
-        email: user.email
+        email: user.email,
+        password:user.password
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    res.status(200)
-      .cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 3600000,
-      })
-      .json({
+    res.status(200).json({
         message: "Login successful",
-        user: user
+        user: user,
+        token:token,
+        role:user.role,
+        isloggedin:true
       });
   } catch (error) {
     console.error("Error during login:", error);
@@ -290,9 +290,13 @@ const viewveterinary=async (req, res) => {
   }
 };
 
+const logout=async(req,res)=>{
+  
+}
+
 
 module.exports = {
-  signup, login, gallery, addDonation, addRescue,getUserDetails,updateUserDetails,viewpets,pets,vaccination,veterinary,adopt,viewveterinary
+  signup, login, gallery, addDonation, addRescue,getUserDetails,updateUserDetails,viewpets,pets,vaccination,veterinary,adopt,viewveterinary,logout
 }
 
 
