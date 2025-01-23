@@ -21,7 +21,7 @@ connectDB()
   .then(() => {
 
     app.use('/user', userRoutes);
-    // app.use('/admin', adminRoutes);
+    app.use('/admin', adminRoutes);
 
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {

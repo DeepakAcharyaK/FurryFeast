@@ -23,30 +23,66 @@ const Login = ({setIsloggedin,setRole}) => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+  
     if (validateLogin()) {
       try {
-        const response = await axios.post(
+        // Admin Login API Call
+        if (email === "admin@gmail.com" && password === "admin") {
+          const adminResponse = await axios.post(
+            "http://localhost:3000/admin/login",
+            { email, password },
+            { withCredentials: true }
+          );
+  
+          if (adminResponse.status === 200) {
+            console.log("Admin login successful");
+  
+            const { token, isloggedin, role } = adminResponse.data;
+  
+            // Store admin details in localStorage
+            window.localStorage.setItem("token", token);
+            window.localStorage.setItem("isloggedin", isloggedin);
+            window.localStorage.setItem("role", role);
+  
+            setIsloggedin(isloggedin);
+            setRole(role);
+  
+            // Navigate to admin routes
+            navigate("/adminDashboard");
+  
+            // Clear email and password fields
+            setEmail("");
+            setPassword("");
+  
+            return; // Exit after successful admin login
+          }
+        }
+  
+        // User Login API Call
+        const userResponse = await axios.post(
           "http://localhost:3000/user/login",
           { email, password },
           { withCredentials: true }
         );
   
-        if (response.status === 200) {
-          const { token, role, isloggedin, user } = response.data;
-
-          console.log("Login successful");
-          console.log(`User_id:${user._id} Email:${user.email} Role:${user.role}`);
-
+        if (userResponse.status === 200) {
+          console.log("User login successful");
+  
+          const { token, role, isloggedin, user } = userResponse.data;
+  
+          // Store user details in localStorage
           window.localStorage.setItem("token", token);
           window.localStorage.setItem("role", role);
-          window.localStorage.setItem("userid",user._id);
+          window.localStorage.setItem("userid", user._id);
           window.localStorage.setItem("isloggedin", isloggedin);
   
           setIsloggedin(isloggedin);
           setRole(role);
   
+          // Navigate to user routes
           navigate(`/${user._id}`);
-
+  
+          // Clear email and password fields
           setEmail("");
           setPassword("");
         }

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+//user
 import AddDonations from './pages/AddDonations';
 import AddResues from './pages/AddResues';
 import Landing from './pages/Landing';
@@ -12,6 +13,9 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ProtectedRoutes from './components/ProtectedRoutes';
 import Profile from './pages/Profile';
+
+//admin
+import ManageDonation from './pages/adminPages/ManageDonation'
 
 function App() {
   const [isloggedin, setIsloggedin] = useState(localStorage.getItem('isloggedin') === 'true');
@@ -53,6 +57,14 @@ function App() {
                 <Route path="/user/:userid/profile/settings" element={<Settings />} />
               </>
             )}
+
+            {
+              role==='admin' &&(
+                <>
+                  <Route path="/adminDashboard" element={<ManageDonation/>} />
+                </>
+              )
+            }
           </Route>
         )}
         <Route path="/profile" element={<Profile />} />
