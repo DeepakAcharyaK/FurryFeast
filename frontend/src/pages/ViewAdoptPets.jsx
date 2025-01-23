@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Container, Grid, Card, CardMedia, CardContent, Typography, } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import Navbar from "../components/Navbar";
+import Navbar from '../components/Navbar'
 
 const ViewAdoptPets = () => {
+  const {userid} = useParams();
   const [petsData, setPetsData] = useState([]);
   const navigate = useNavigate();
 
@@ -13,7 +14,7 @@ const ViewAdoptPets = () => {
       try {
         const response = await axios.get("http://localhost:3000/user/viewpets");
         console.log(response.data);
-        setPetsData(response.data);
+        setPetsData(response.data.data);
       } catch (error) {
         console.error("Failed to fetch pets:", error);
       }
@@ -22,7 +23,7 @@ const ViewAdoptPets = () => {
   }, []);
 
   const handleCardClick = (id) => {
-    navigate(`/petdetails/${id}`);
+    navigate(`/user/${userid}/adopt/pets/petdetails/${id}`);
   };
 
   return (

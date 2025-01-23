@@ -7,6 +7,8 @@ router.post('/signup',userControllers.signup)
 
 router.post('/login',userControllers.login)
 
+router.get('/search',userControllers.search)
+
 router.get('/gallery',userControllers.gallery)
 
 router.post('/adddonation',userControllers.addDonation)
@@ -29,7 +31,7 @@ router.put('/pets/:id/adopt',userControllers.adopt)
 
 router.get('/viewveterinary',userControllers.viewveterinary)
 
-router.get('/logout',userControllers.logout)
+// router.get('/logout',userControllers.logout)
 
 // router.get('/:id/works',userControllers.works)
 

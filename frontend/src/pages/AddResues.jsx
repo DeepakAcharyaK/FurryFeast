@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Typography, TextField, Button, Grid, Card, CardContent, MenuItem } from "@mui/material";
 import axios from "axios";
-import Navbar from "../components/Navbar";
+import Navbar from '../components/Navbar'
 
 const AddRescues = () => {
 

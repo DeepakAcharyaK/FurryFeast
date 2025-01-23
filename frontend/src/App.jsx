@@ -14,53 +14,55 @@ import ProtectedRoutes from './components/ProtectedRoutes';
 import Profile from './pages/Profile';
 
 function App() {
-  const [isloggedin, setIsloggedin] = useState(false);
-  const [role, setRole] = useState('');
+  const [isloggedin, setIsloggedin] = useState(localStorage.getItem('isloggedin') === 'true');
+  const [userid, setuserid] = useState(localStorage.getItem('userid') || '');
+  const [role, setRole] = useState(localStorage.getItem('role') || '');
 
   useEffect(() => {
-    const loggedIn = localStorage.getItem('isloggedin') === 'true';
-    const userRole = localStorage.getItem('role');
-    setIsloggedin(loggedIn);
-    setRole(userRole);
+    setIsloggedin(localStorage.getItem('isloggedin') === 'true');
+    setuserid(localStorage.getItem('userid') || '');
+    setRole(localStorage.getItem('role') || '');
   }, []);
 
   return (
-    <>
-      <BrowserRouter>
-        <Routes>
-          {!isloggedin ? (
-            <>
-              <Route path="/" element={<Landing />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-            </>
-          ) : (
-            <Route element={<ProtectedRoutes isloggedin={isloggedin} />}>
-              <Route path="/:userid" element={<Landing />} />
-              <Route path="/login" element={<Navigate to="/:userid" />} />
-              <Route path="/signup" element={<Navigate to="/:userid" />} />
-              {role !== 'admin' && (
-                <>
-                  <Route path="/adddonations" element={<AddDonations />} />
-                  <Route path="/viewgallery" element={<ViewGallery />} />
-                  <Route path="/addresues" element={<AddResues />} />
-                  <Route path="/viewadoptpets" element={<ViewAdoptPets />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/petdetails/:id" element={<PetDetails />} />
-                  <Route path="/viewveterinary" element={<ViewVeterinary />} />
-                </>
-              )}
-            </Route>
-          )}
-          <Route path="/profile" element={<Profile />} />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </BrowserRouter>
-    </>
+    <BrowserRouter>
+      <Routes>
+        {!isloggedin ? (
+          <>
+            <Route path="/" element={<Landing />} />
+            <Route
+              path="/login"
+              element={<Login setIsloggedin={setIsloggedin} setRole={setRole} />}
+            />
+            <Route path="/signup" element={<Signup setuserid={setuserid} />} />
+          </>
+        ) : (
+          <Route element={<ProtectedRoutes />}>
+            <Route path="/:userid" element={<Landing />} />
+            <Route path="/login" element={<Navigate to={`/${userid}`} />} />
+            <Route path="/signup" element={<Navigate to={`/${userid}`} />} />
+
+            {role !== 'admin' && (
+              <>
+                <Route path="/user/:userid/make-a-donation" element={<AddDonations />} />
+                <Route path="/user/:userid/view-gallery" element={<ViewGallery />} />
+                <Route path="/user/:userid/pets/rescue" element={<AddResues />} />
+                <Route path="/user/:userid/adopt/pets" element={<ViewAdoptPets />} />
+                <Route path="/user/:userid/view-veterinary" element={<ViewVeterinary />} />
+                <Route path="/user/:userid/adopt/pets/petdetails/:id" element={<PetDetails />} />
+                <Route path="/user/:userid/profile/settings" element={<Settings />} />
+              </>
+            )}
+          </Route>
+        )}
+        <Route path="/profile" element={<Profile />} />
+
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
 export default App;
-
 
 

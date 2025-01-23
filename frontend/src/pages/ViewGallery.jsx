@@ -7,7 +7,7 @@ import {
   CardContent,
 } from "@mui/material";
 import Masonry from "@mui/lab/Masonry"; // Import Masonry
-import Navbar from "../components/Navbar";
+import Navbar from '../components/Navbar'
 
 const ViewGallery = () => {
   const [galleryData, setGalleryData] = useState([]);

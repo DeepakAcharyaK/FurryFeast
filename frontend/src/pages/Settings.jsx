@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {Box,Typography,TextField,Avatar,Button,CircularProgress,} from "@mui/material";
-import Navbar from "../components/Navbar";
+import Navbar from '../components/Navbar'
 
 const ProfileSettings = () => {
   const [loading, setLoading] = useState(true);

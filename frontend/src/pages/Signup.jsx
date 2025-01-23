@@ -1,32 +1,22 @@
 import React, { useState } from "react";
-import {
-  TextField,
-  Button,
-  Typography,
-  Link,
-  Checkbox,
-  FormControlLabel,
-  Container,
-  Box,
-} from "@mui/material";
-import { Navigate, useNavigate } from "react-router-dom";
+import {TextField,Button,Typography,Checkbox,FormControlLabel,Container,Box,} from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import Navbar from "../components/Navbar";
+import Navbar from '../components/Navbar'
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
 
   const validateSignup = () => {
     const newErrors = {};
     if (!username) newErrors.username = "Username is required.";
     if (!email) newErrors.email = "Email is required.";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = "Invalid email format.";
-
     if (!password) newErrors.password = "Password is required.";
 
     setErrors(newErrors);
@@ -35,6 +25,7 @@ const Signup = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    
     if (validateSignup()) {
       try {
         const response = await axios.post("http://localhost:3000/user/signup", {
@@ -44,8 +35,12 @@ const Signup = () => {
         });
 
         if (response.status === 201) {
+          const {_id,email} =response.data;
           console.log("Signup successful");
+          console.log(`User_id:${_id} Email:${email}`);
+
           navigate("/login");
+
           setUsername("");
           setEmail("");
           setPassword("");

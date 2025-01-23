@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { TextField, Button, Typography, Link, Container, Box, } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import Navbar from "../components/Navbar";
+import Navbar from '../components/Navbar'
 
-const Login = () => {
+const Login = ({setIsloggedin,setRole}) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,16 +33,20 @@ const Login = () => {
   
         if (response.status === 200) {
           const { token, role, isloggedin, user } = response.data;
+
           console.log("Login successful");
           console.log(`User_id:${user._id} Email:${user.email} Role:${user.role}`);
+
           window.localStorage.setItem("token", token);
           window.localStorage.setItem("role", role);
+          window.localStorage.setItem("userid",user._id);
           window.localStorage.setItem("isloggedin", isloggedin);
   
-          // setIsloggedin(isloggedin);
-          // setRole(role);
+          setIsloggedin(isloggedin);
+          setRole(role);
   
           navigate(`/${user._id}`);
+
           setEmail("");
           setPassword("");
         }

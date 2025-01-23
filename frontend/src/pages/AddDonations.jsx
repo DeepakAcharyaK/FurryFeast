@@ -1,34 +1,25 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Grid,
-  Card,
-  CardContent,
-} from "@mui/material";
-import Navbar from "../components/Navbar";
+import { Box, Typography, TextField, Button, Grid, Card, CardContent, } from "@mui/material";
+import Navbar from '../components/Navbar'
 import axios from "axios";
+import { useParams } from "react-router-dom";
 
 const AddDonations = () => {
+  const {userid}= useParams()
   const [formData, setFormData] = useState({
     donorname: "",
-    email: "",
     contact: "",
     amount: "",
     donationdate: "",
     description: "",
     paymentReference: "",
   });
-
   const [errors, setErrors] = useState({});
+
 
   const validate = () => {
     let tempErrors = {};
     if (!formData.donorname) tempErrors.donorname = "Donor name is required.";
-    if (!formData.email) tempErrors.email = "Email is required.";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) tempErrors.email = "Invalid email format.";
     if (!formData.contact) tempErrors.contact = "Contact number is required.";
     if (!formData.amount) tempErrors.amount = "Amount is required.";
     else if (isNaN(formData.amount) || formData.amount <= 0) tempErrors.amount = "Enter a valid amount.";
@@ -51,31 +42,25 @@ const AddDonations = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
-      console.log("Donation form Data:", formData);
+      try {
+        const response = await axios.post('http://localhost:3000/user/adddonation', { formData,userid })
 
-      const response=await axios.post('http://localhost:3000/user/adddonation',{
-        donorname: formData.donorname,
-        email:formData.email,
-        contact:formData.contact,
-        amount:formData.amount,
-        donationdate:formData.donationdate,
-        description:formData.description,
-        paymentReference:formData.paymentReference,
-      })
+        if (response.status === 201) {
+          console.log('Donation details:', response.data)
 
-      console.log(response.data)
-
-      // Reset form
-      setFormData({
-        donorname: "",
-        email: "",
-        contact: "",
-        amount: "",
-        donationdate: "",
-        description: "",
-        paymentReference: "",
-      });
-      setErrors({});
+          setFormData({
+            donorname: "",
+            contact: "",
+            amount: "",
+            donationdate: "",
+            description: "",
+            paymentReference: "",
+          });
+          setErrors({});
+        }
+      } catch (error) {
+        console.log('Failed to add donation', error)
+      }
     }
   };
 
@@ -121,7 +106,7 @@ const AddDonations = () => {
                   />
                 </Grid>
                 {/* Email */}
-                <Grid item xs={12} sm={6}>
+                {/* <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
                     label="Email"
@@ -136,7 +121,7 @@ const AddDonations = () => {
                     error={!!errors.email}
                     helperText={errors.email}
                   />
-                </Grid>
+                </Grid> */}
                 {/* Contact */}
                 <Grid item xs={12} sm={6}>
                   <TextField

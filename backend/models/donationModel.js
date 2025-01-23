@@ -4,10 +4,10 @@ const donationSchema = new mongoose.Schema({
     donorname: {
         type: String,
         required: [true, "Please enter a username"],
-        minlength: [3, "Username must be at least 3 characters long"],
     },
-    email: {
-        type: String,
+    donatedby: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'User'
     },
     contact: {
         type: String,

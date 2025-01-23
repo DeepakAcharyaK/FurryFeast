@@ -14,6 +14,7 @@ import {
   Grid,
   Paper,
 } from "@mui/material";
+import Navbar from '../components/Navbar'
 
 const PetDetails = () => {
   const navigate = useNavigate();
@@ -30,11 +31,13 @@ const PetDetails = () => {
 
         // Fetch pet details
         const petResponse = await axios.get(`http://localhost:3000/user/pets/${id}`);
-        setPet(petResponse.data);
+        console.log(petResponse)
+        setPet(petResponse.data.data);
 
         // Fetch vaccination details
         const vaccResponse = await axios.get(`http://localhost:3000/user/vaccinations/${id}`);
-        setVaccinations(vaccResponse.data);
+        console.log(vaccResponse)
+        setVaccinations(vaccResponse.data.data);
 
         setLoading(false);
       } catch (err) {
@@ -50,7 +53,7 @@ const PetDetails = () => {
       const response = await axios.put(`http://localhost:3000/user/pets/${id}/adopt`, {
         adoptionStatus: "Pending", 
       });
-      setPet(response.data);
+      setPet(response.data.data);
       alert("Adoption process initiated successfully!");
     } catch (error) {
       console.error("Error during the adoption process:", error);
@@ -89,6 +92,8 @@ const PetDetails = () => {
   }
 
   return (
+    <>
+     <Navbar/>
     <Container maxWidth="lg" sx={{ mt: 4, padding: 2 }}>
       <Card sx={{ display: "flex", flexDirection: "column", boxShadow: 4, borderRadius: 3 }}>
         <Grid container spacing={4}>
@@ -212,6 +217,7 @@ const PetDetails = () => {
         </Box>
       </Card>
     </Container>
+    </>
   );
 };
 

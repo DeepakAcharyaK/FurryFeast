@@ -18,7 +18,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import PhoneIcon from "@mui/icons-material/Phone";
-import Navbar from "../components/Navbar";
+import Navbar from '../components/Navbar'
 
 const ViewVeterinary = () => {
   const [vets, setVets] = useState([]);
@@ -30,7 +30,8 @@ const ViewVeterinary = () => {
     const fetchVeterinarians = async () => {
       try {
         const response = await axios.get("http://localhost:3000/user/viewveterinary");
-        setVets(response.data);
+        console.log(response)
+        setVets(response.data.data);
         setLoading(false);
       } catch (err) {
         setError("Failed to fetch veterinarians. Please try again later.");
