@@ -7,6 +7,10 @@ router.post('/login',adminController.adminLogin)
 
 router.get('/donations', adminController.manageDonations);
 
+router.patch('/donations/update-status/:donationId', adminController.updateStatus);
+
+router.delete('/donations/delete/:donationId', adminController.deleteDonation);
+
 // router.post('/manage-donation', adminController.ManageDonation);
 
 // router.post('/manage-volunteer', adminController.ManageVolunteer);

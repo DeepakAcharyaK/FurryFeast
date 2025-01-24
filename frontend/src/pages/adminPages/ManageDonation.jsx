@@ -1,60 +1,36 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {
-  DataGrid,
-  GridToolbar,
-} from "@mui/x-data-grid";
-import {
-  IconButton,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Button,
-  TextField,
-} from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
+import { DataGrid, GridToolbar, } from "@mui/x-data-grid";
+import { IconButton, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 const ManageDonation = () => {
-  const [donorName, setDonorName] = useState("");
-  const [contact, setContact] = useState("");
-  const [donationDate, setDonationDate] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("");
+
   const [donationData, setDonationData] = useState([]);
   const [selectedDonation, setSelectedDonation] = useState(null);
-  const [openDialog, setOpenDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
-     
-      // donatedby: {
-      //     type: mongoose.Schema.Types.ObjectId,
-      //     ref:'User'
-      // },
-      // status: {
-      //     type: String,
-      //     enum: ["Pending", "Accepted", "Rejected"],
-      //     default: "Pending",
-      // }
+
   const columns = [
     { field: "_id", headerName: "Donation ID", width: 120 },
     { field: "donorname", headerName: "Donor Name", width: 180 },
+    { field: "email", headerName: "Email", width: 200 },
     { field: "contact", headerName: "Contact", width: 150 },
     { field: "donationdate", headerName: "Donation Date", width: 150 },
     { field: "description", headerName: "Description", width: 200 },
-    { field: "paymentReference", headerName: "Payment reference", width: 200 },
+    { field: "paymentReference", headerName: "Payment Reference", width: 200 },
     { field: "amount", headerName: "Amount", width: 200 },
+    { field: "status", headerName: "Status", width: 250 },
     {
-      field: "status",
-      headerName: "Status",
-      width: 250,
+      field: "actions",
+      headerName: "Actions",
+      width: 180,
       renderCell: (params) => (
         <>
           <Button
             variant="contained"
             color="success"
-            onClick={() => updateStatus(params.row.donation_id, "Accepted")}
+            onClick={() => updateStatus(params.row._id, "Accepted")}
             style={{ marginRight: "10px" }}
           >
             Accept
@@ -62,23 +38,11 @@ const ManageDonation = () => {
           <Button
             variant="contained"
             color="error"
-            onClick={() => updateStatus(params.row.donation_id, "Rejected")}
+            onClick={() => updateStatus(params.row._id, "Rejected")}
           >
             Reject
           </Button>
-        </>
-      ),
-    },
-    {
-      field: "actions",
-      headerName: "Actions",
-      width: 180,
-      renderCell: (params) => (
-        <>
-          <IconButton onClick={() => handleEdit(params.row)}>
-            <EditIcon />
-          </IconButton>
-          <IconButton onClick={() => handleDelete(params.row)}>
+          <IconButton onClick={() => handleDelete(params.row._id)}>
             <DeleteIcon />
           </IconButton>
         </>
@@ -92,7 +56,7 @@ const ManageDonation = () => {
       setDonationData(
         response.data.donations.map((donation) => ({
           ...donation,
-          id: donation.donation_id, // Ensure the key matches DataGrid's expectations
+          email: donation.email
         }))
       );
     } catch (error) {
@@ -105,102 +69,47 @@ const ManageDonation = () => {
   }, []);
 
   useEffect(() => {
-    console.log(donationData); 
+    console.log(donationData);
   }, [donationData]);
-
-  const handleEdit = (donation) => {
-    setDonorName(donation.donorname);
-    setContact(donation.contact);
-    setDonationDate(donation.donation_date);
-    setDescription(donation.description);
-    setStatus(donation.status);
-    setSelectedDonation(donation);
-    setOpenDialog(true);
-  };
-
-  const handleDelete = (donation) => {
-    setSelectedDonation(donation);
-    setOpenDeleteDialog(true);
-  };
-
-  const handleAdd = async () => {
-    try {
-      await axios.post("http://localhost:3005/api/donations/add", {
-        donorName,
-        contact,
-        donationDate,
-        description,
-        status: "Pending",
-      });
-      fetchDonationData();
-    } catch (error) {
-      console.error("Error adding donation:", error);
-    }
-  };
-
-  const handleUpdate = async () => {
-    try {
-      await axios.put(
-        `http://localhost:3005/api/donations/update/${selectedDonation.donation_id}`,
-        {
-          donorName,
-          contact,
-          donationDate,
-          description,
-          status,
-        }
-      );
-      fetchDonationData();
-    } catch (error) {
-      console.error("Error updating donation:", error);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (selectedDonation) {
-      await handleUpdate();
-    } else {
-      await handleAdd();
-    }
-    setOpenDialog(false);
-    setDonorName("");
-    setContact("");
-    setDonationDate("");
-    setDescription("");
-    setStatus("");
-    setSelectedDonation(null);
-  };
-
-  const confirmDelete = async () => {
-    try {
-      await axios.delete(
-        `http://localhost:3005/api/donations/delete/${selectedDonation.donation_id}`
-      );
-      fetchDonationData();
-      setOpenDeleteDialog(false);
-      setSelectedDonation(null);
-    } catch (error) {
-      console.error("Error deleting donation:", error);
-    }
-  };
 
   const updateStatus = async (donationId, newStatus) => {
     try {
-      await axios.patch(
-        `http://localhost:3005/api/donations/update-status/${donationId}`,
-        { status: newStatus }
-      );
-      fetchDonationData();
+      const response = await axios.patch(`http://localhost:3000/admin/donations/update-status/${donationId}`, {
+        status: newStatus
+      });
+      if (response.status == 200)
+        fetchDonationData();
     } catch (error) {
       console.error(`Error updating status for donation ID ${donationId}:`, error);
     }
   };
 
+  const handleDelete = (donation) => {
+    setSelectedDonation(donation);
+    setOpenDeleteDialog(true);
+    console.log(selectedDonation)
+  };
+
+  const confirmDelete = async () => {
+    try {
+      const response = await axios.delete(`http://localhost:3000/admin/donations/delete/${selectedDonation}`);
+      setOpenDeleteDialog(false)
+      setSelectedDonation(null);
+      if (response == 200) {
+        fetchDonationData();
+      }
+    } catch (error) {
+      console.error("Error deleting donation:", error);
+    }
+  };
+
+
+
   return (
     <div>
       <div style={{ height: 400, width: "100%", marginTop: "20px" }}>
         <DataGrid
-          rows={donationData} 
+          rows={donationData}
           columns={columns}
           pageSize={5}
           rowsPerPageOptions={[5]}
@@ -211,62 +120,6 @@ const ManageDonation = () => {
         />
       </div>
 
-      {/* Dialog for Add/Edit */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>
-          {selectedDonation ? "Update Donation" : "Add Donation"}
-        </DialogTitle>
-        <DialogContent>
-          <TextField
-            margin="dense"
-            label="Donor Name"
-            type="text"
-            fullWidth
-            value={donorName}
-            onChange={(e) => setDonorName(e.target.value)}
-            required
-          />
-          <TextField
-            margin="dense"
-            label="Contact"
-            type="text"
-            fullWidth
-            value={contact}
-            onChange={(e) => setContact(e.target.value)}
-            required
-          />
-          <TextField
-            margin="dense"
-            label="Donation Date"
-            type="date"
-            fullWidth
-            value={donationDate}
-            onChange={(e) => setDonationDate(e.target.value)}
-            required
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-          <TextField
-            margin="dense"
-            label="Description"
-            type="text"
-            fullWidth
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)} color="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} color="primary">
-            {selectedDonation ? "Update" : "Add"}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
       {/* Dialog for Delete Confirmation */}
       <Dialog
         open={openDeleteDialog}
@@ -274,7 +127,7 @@ const ManageDonation = () => {
       >
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
-          Are you sure you want to delete {selectedDonation?.donor_name}'s donation?
+          Are you sure you want to delete {selectedDonation?.donorname}'s donation?
         </DialogContent>
         <DialogActions>
           <Button

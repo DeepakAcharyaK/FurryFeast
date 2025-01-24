@@ -65,7 +65,7 @@ function Maincontainer() {
 //   useEffect(() => {
 //     const fetchWorks = async () => {
 //       try {
-//         const response = await axios.get('/api/works?limit=3'); // Fetch 3 items from works collection
+//         const response = await axios.get('http://localhost:3000//works?limit=3'); // Fetch 3 items from works collection
 //         setWorks(response.data);
 //       } catch (error) {
 //         console.error('Error fetching works:', error);

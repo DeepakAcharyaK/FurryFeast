@@ -42,13 +42,30 @@ const adminLogin = async (req, res) => {
 // Manage Donations
 const manageDonations = async (req, res) => {
     try {
-        const donations = await Donation.find();
+        const donations = await Donation.find().populate('donatedby');
         res.status(200).json({ message: 'Donations fetched successfully', donations });
     } catch (error) {
         console.error('Error fetching donations:', error);
         res.status(500).json({ message: 'Failed to fetch donations' });
     }
 };
+
+const updateStatus=async(req,res)=>{
+  const {donationId}=req.params;
+  const {status}=req.body;
+  const updatedDonation=await Donation.findByIdAndUpdate(donationId,{status:status},{new:true})
+  res.status(200).json({
+    updatedDonation
+  })
+}
+
+const deleteDonation=async(req,res)=>{
+  const {donationId}=req.params;
+  const deletedDonation=await Donation.findByIdAndDelete(donationId)
+  res.status(200).json({
+    deletedDonation
+  })
+}
 
 // // Manage Rescue Requests
 // const manageRescueRequests = async (req, res) => {
@@ -113,7 +130,9 @@ const manageDonations = async (req, res) => {
 // Export all controllers
 module.exports = {
     adminLogin,
-    manageDonations
+    manageDonations,
+    updateStatus,
+    deleteDonation
     // manageRescueRequests,
     // updateGallery,
     // managePets,
