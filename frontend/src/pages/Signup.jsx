@@ -1,7 +1,10 @@
+import '../App.css';
 import React, { useState } from "react";
-import {TextField,Button,Typography,Checkbox,FormControlLabel,Container,Box,} from "@mui/material";
+import { TextField, Button, Typography, Checkbox, FormControlLabel, Container, Box, } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+
 import Navbar from '../components/Navbar'
 
 const Signup = () => {
@@ -25,104 +28,109 @@ const Signup = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    
+
     if (validateSignup()) {
       try {
         const response = await axios.post("http://localhost:3000/user/signup", {
-          username,
-          email,
-          password,
+          username, email, password,
         });
 
         if (response.status === 201) {
-          const {_id,email} =response.data;
           console.log("Signup successful");
-          console.log(`User_id:${_id} Email:${email}`);
+          toast.success("Signup successful",{autoClose:1000})
+          setTimeout(() => {
+            const { _id, email } = response.data;
+            console.log(`User_id:${_id} Email:${email}`);
 
-          navigate("/login");
+            navigate("/login");
 
-          setUsername("");
-          setEmail("");
-          setPassword("");
-          setRememberMe(false);
+            setUsername("");
+            setEmail("");
+            setPassword("");
+            setRememberMe(false);
+          }, 1000);
         }
       } catch (error) {
+        error.response.data.message && toast.warn(error.response.data.message)
+        
         console.error("Signup error:", error.response?.data?.message || error.message);
+        response.status==500 && toast.warn(error.response.data.message)
       }
     }
   };
 
   return (
     <>
-      <Navbar/>
+      <Navbar />
       <Container component="main" maxWidth="xs">
-      <Box sx={{ marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <Typography component="h1" variant="h5">
-          Sign Up
-        </Typography>
-        <Box component="form" onSubmit={handleSignup} noValidate sx={{ mt: 1 }}>
-          <TextField
-            margin="normal"
-            fullWidth
-            id="username"
-            label="Username"
-            name="username"
-            autoComplete="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            error={!!errors.username}
-            helperText={errors.username}
-          />
-          <TextField
-            margin="normal"
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            error={!!errors.email}
-            helperText={errors.email}
-          />
-          <TextField
-            margin="normal"
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            error={!!errors.password}
-            helperText={errors.password}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                value={rememberMe}
-                color="primary"
-                onChange={(e) => setRememberMe(e.target.checked)}
-              />
-            }
-            label="Remember me"
-          />
-          <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+        <Box sx={{ marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Typography component="h1" variant="h5">
             Sign Up
-          </Button>
-          <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-            Already a user?{" "}
-            <span
-              onClick={() => navigate("/login")}
-              style={{ cursor: "pointer", color: "blue", fontWeight: "bold" }}
-            >
-              Login
-            </span>
           </Typography>
+          <Box component="form" onSubmit={handleSignup} noValidate sx={{ mt: 1 }}>
+            <TextField
+              margin="normal"
+              fullWidth
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              error={!!errors.username}
+              helperText={errors.username}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              error={!!errors.email}
+              helperText={errors.email}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              error={!!errors.password}
+              helperText={errors.password}
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  value={rememberMe}
+                  color="primary"
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
+              }
+              label="Remember me"
+            />
+            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+              Sign Up
+            </Button>
+            <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+              Already a user?{" "}
+              <span
+                onClick={() => navigate("/login")}
+                style={{ cursor: "pointer", color: "blue", fontWeight: "bold" }}
+              >
+                Login
+              </span>
+            </Typography>
+          </Box>
         </Box>
-      </Box>
-    </Container>
+      </Container>
+      <ToastContainer />
     </>
   );
 };

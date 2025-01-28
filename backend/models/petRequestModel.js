@@ -21,8 +21,8 @@ const petRequestSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["Pending", "Accepted", "Rejected"], // Allow only these values
-        default: "Pending", // Set the default status to 'Pending'
+        enum: ["Pending", "Accepted", "Rejected"],
+        default: "Pending", 
     },
     requestdate:{
         type:Date,

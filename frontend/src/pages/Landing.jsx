@@ -1,21 +1,13 @@
-import React, { useRef, useState, useEffect } from 'react';
-import axios from 'axios';
-import Navbar from '../components/Navbar'
 import '../stylesheets/Landing.css';
 import '../App.css';
-import Footer from '../components/Footer';
-import gsap from 'gsap';
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Avatar,
-  Tooltip,
-  Grid
-} from "@mui/material";
+import React, { useRef, useState, useEffect } from 'react';
+import {Box,Card,CardContent,Typography,Chip,Avatar,Grid} from "@mui/material";
 import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
+import gsap from 'gsap';
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer';
+
 
 function Landing({ mode }) {
   const navigate=useNavigate();

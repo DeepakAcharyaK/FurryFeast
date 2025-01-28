@@ -23,21 +23,13 @@ const donationSchema = new mongoose.Schema({
         default: "INR",
     },
     description: {
-        type: String,
-        required: [true, "Please enter the description"],
+        type: String
     },
     status: {
         type: String,
-        enum: ["Pending", "Accepted", "Rejected"],
+        enum: ["Pending", "Done"],
         default: "Pending",
-    },
-    donationdate: {
-        type: Date,
-        default: Date.now,
-    },
-    paymentReference: {
-        type: String,
-    },
+    }
 }, { timestamps: true });
 
 const Donation = mongoose.model('Donation', donationSchema);

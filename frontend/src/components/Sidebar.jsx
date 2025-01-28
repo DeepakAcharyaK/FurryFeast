@@ -39,7 +39,10 @@ const Sidebar = ({ userid, isOpen, toggleSidebar }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
+  const [userID, setuserID] = useState(userid)
   const [loggeduserDets, setloggeduserDets] = useState({})
+
+  console.log(userID)
 
   useEffect(() => {
     const fetchdata = async () => {
@@ -60,9 +63,9 @@ const Sidebar = ({ userid, isOpen, toggleSidebar }) => {
 
 
   const navigationItems = [
-    { text: "Donations made", icon: <FaDonate size={24} />, route: "/donations" },
-    { text: "Adopted pets", icon: <GiDogHouse size={24} />, route: "/adopted-pets" },
-    { text: "Rescued pets", icon: <MdOutlineLocalHospital size={24} />, route: "/rescued-pets" },
+    { text: "Donations made", icon: <FaDonate size={24} />, route: `/user/${userID}/all/donations/made-by/${userID}` },
+    { text: "Adopted pets", icon: <GiDogHouse size={24} />, route: `/user/${userID}/all/adopted/pets-by/${userID}` },
+    { text: "Rescued pets", icon: <MdOutlineLocalHospital size={24} />, route: `/user/${userID}/all/rescued/pets-by/${userID}` },
     { text: "Settings", icon: <FiSettings size={24} />, route: `/user/${userid}/profile/settings` },
   ];
 
@@ -70,7 +73,7 @@ const Sidebar = ({ userid, isOpen, toggleSidebar }) => {
     <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
       <ProfileSection>
         <Avatar
-          src={`${loggeduserDets.profilePicture}`}
+          src={`http://localhost:3000${loggeduserDets.profilePicture}`}
           sx={{ width: 80, height: 80, marginBottom: 2 }}
         />
         <Typography variant="h6">{loggeduserDets.username}</Typography>

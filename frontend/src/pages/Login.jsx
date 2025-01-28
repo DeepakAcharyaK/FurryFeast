@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { TextField, Button, Typography, Link, Container, Box, } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
 import Navbar from '../components/Navbar'
 
-const Login = ({setIsloggedin,setRole}) => {
+const Login = ({ setIsloggedin, setRole }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,7 +13,7 @@ const Login = ({setIsloggedin,setRole}) => {
 
   const validateLogin = () => {
     const newErrors = {};
-    if (!email) newErrors.email = "Email is required.";
+    if (!email) { newErrors.email = "Email is required."; }
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = "Invalid email format.";
 
     if (!password) newErrors.password = "Password is required.";
@@ -23,70 +24,69 @@ const Login = ({setIsloggedin,setRole}) => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-  
+
     if (validateLogin()) {
       try {
-        // Admin Login API Call
+
         if (email === "admin@gmail.com" && password === "admin") {
           const adminResponse = await axios.post(
             "http://localhost:3000/admin/login",
             { email, password },
             { withCredentials: true }
           );
-  
+
           if (adminResponse.status === 200) {
             console.log("Admin login successful");
-  
-            const { token, isloggedin, role } = adminResponse.data;
-  
-            // Store admin details in localStorage
-            window.localStorage.setItem("token", token);
+
+            const { isloggedin, role } = adminResponse.data;
+
+
             window.localStorage.setItem("isloggedin", isloggedin);
             window.localStorage.setItem("role", role);
-  
+
             setIsloggedin(isloggedin);
             setRole(role);
-  
-            // Navigate to admin routes
+
             navigate("/adminDashboard");
-  
-            // Clear email and password fields
+
             setEmail("");
             setPassword("");
-  
-            return; // Exit after successful admin login
+
+            return;
+          }
+        } else {
+          const userResponse = await axios.post(
+            "http://localhost:3000/user/login",
+            { email, password },
+            { withCredentials: true });
+
+          if (userResponse.status === 200) {
+            console.log("User login successful");
+            toast.success('User login successful', { autoClose: 1000 })
+
+            setTimeout(() => {
+              const { token, role, isloggedin, user } = userResponse.data;
+
+              window.localStorage.setItem("token", token);
+              window.localStorage.setItem("role", role);
+              window.localStorage.setItem("userid", user._id);
+              window.localStorage.setItem("isloggedin", isloggedin);
+
+              setIsloggedin(isloggedin);
+              setRole(role);
+
+              navigate(`/${user._id}`);
+
+              setEmail("");
+              setPassword("");
+
+              return;
+            }, 1000);
           }
         }
-  
-        // User Login API Call
-        const userResponse = await axios.post(
-          "http://localhost:3000/user/login",
-          { email, password },
-          { withCredentials: true }
-        );
-  
-        if (userResponse.status === 200) {
-          console.log("User login successful");
-  
-          const { token, role, isloggedin, user } = userResponse.data;
-  
-          // Store user details in localStorage
-          window.localStorage.setItem("token", token);
-          window.localStorage.setItem("role", role);
-          window.localStorage.setItem("userid", user._id);
-          window.localStorage.setItem("isloggedin", isloggedin);
-  
-          setIsloggedin(isloggedin);
-          setRole(role);
-  
-          // Navigate to user routes
-          navigate(`/${user._id}`);
-  
-          // Clear email and password fields
-          setEmail("");
-          setPassword("");
-        }
+
       } catch (error) {
+        (error.response.data.message) && toast.error(error.response.data.message)
         console.error("Login error:", error.response?.data?.message || error.message);
       }
     }
@@ -142,13 +142,15 @@ const Login = ({setIsloggedin,setRole}) => {
                 onClick={() => navigate("/signup")}
                 style={{ cursor: "pointer", color: "blue", fontWeight: "bold" }}
               >
-                Login
+                Signup
               </span>
             </Typography>
           </Box>
         </Box>
       </Container>
+      <ToastContainer />
     </>
+
   );
 };
 

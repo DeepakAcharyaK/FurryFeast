@@ -1,5 +1,9 @@
 const jwt = require('jsonwebtoken');
+const easyinvoice = require('easyinvoice');
+const path = require("path");
+const fs =require('fs')
 const bcrypt = require('bcrypt');
+
 const User = require('../models/userModel');
 const Donation = require('../models/donationModel');
 const Gallery = require('../models/galleryModel');
@@ -7,6 +11,7 @@ const Vaccination = require('../models/vaccinationModel');
 const Veterinary = require('../models/veterinaryModel');
 const Pet = require('../models/petModel');
 const Rescue = require('../models/rescueModel');
+const Payment = require('../models/paymentModel');
 
 const signup = async (req, res) => {
   const { username, email, password } = req.body;
@@ -124,13 +129,13 @@ const search = async (req, res) => {
 
 const addDonation = async (req, res) => {
   try {
-    const { donorname, contact, amount, currency, description, paymentReference } = req.body.formData;
+    const { donorname, contact, amount, description } = req.body.formData;
 
-    if (!donorname || !contact || !amount || !paymentReference) {
+    if (!donorname || !contact || !amount ) {
       console.log("Error: Missing required fields in donation data.");
       return res.status(400).json({
         success: false,
-        message: "Please provide all required fields (donorname, contact, amount, paymentReference).",
+        message: "Please provide all required fields (donorname, contact, amount).",
       });
     }
 
@@ -139,26 +144,52 @@ const addDonation = async (req, res) => {
       donatedby: req.body.userid,
       contact,
       amount,
-      currency: currency || "INR",
-      description,
-      paymentReference,
+      description:description || '',
     });
 
-    console.log("Donation added successfully:", newDonation);
-    res.status(201).json({
+    console.log("Donation details added successfully:", newDonation);
+    res.status(200).json({
       success: true,
-      message: "Donation added successfully.",
+      message: "Donation details added successfully.",
       donationDetails: newDonation,
     });
   } catch (error) {
-    console.error("Error adding donation:", error);
+    console.error("Error adding donation details:", error);
     res.status(500).json({
       success: false,
-      message: "An error occurred while adding the donation.",
+      message: "An error occurred while adding the donation details.",
       error: error.message,
     });
   }
 };
+
+const displayDonation=async(req,res)=>{
+  const { userid } = req.params;
+  try {
+    const donations = await Donation.find({ donatedby: userid });
+    res.status(200).json({ success: true, donations });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+const getDonation=async (req,res)=>{
+  const {donationid}= req.params;
+
+  try {
+    const donation = await Donation.findById(donationid);
+    console.log(donation)
+    res.status(200).json({ 
+      success: true, 
+      donation 
+    });
+  } catch (error) {
+    res.status(500).json({
+       success: false, 
+       message: error.message 
+    });
+  }
+}
 
 const gallery = async (req, res) => {
   try {
@@ -190,27 +221,31 @@ const gallery = async (req, res) => {
 
 const addRescue = async (req, res) => {
   try {
-    const { rescuetitle, location, description } = req.body.formData;
+    const { rescuetitle, location, description, userid } = req.body;
 
     if (!rescuetitle || !location) {
-      console.log("Error: Missing required fields (rescuetitle or location).");
       return res.status(400).json({
         success: false,
         message: "Please provide all required fields (rescuetitle and location).",
       });
     }
 
-    const addedrescueinfo = await Rescue.create({
+    const imagePath = req.file
+      ? `/uploads/${req.file.filename}`
+      : null;
+
+    const addedRescueInfo = await Rescue.create({
       rescuetitle,
       location,
       description,
+      image: imagePath, 
+      rescueinfoby: userid,
     });
 
-    console.log("Rescue information added successfully:", addedrescueinfo);
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       message: "Rescue information added successfully.",
-      data: addedrescueinfo,
+      data: addedRescueInfo,
     });
   } catch (error) {
     console.error("Error adding rescue information:", error);
@@ -221,6 +256,16 @@ const addRescue = async (req, res) => {
     });
   }
 };
+
+const rescuedPets=async(req,res)=>{
+  const { userid } = req.params;
+  try {
+    const rescues = await Rescue.find({ rescueinfoby: userid });
+    res.status(200).json({ success: true, rescues });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
 
 const getUserDetails = async (req, res) => {
   try {
@@ -251,51 +296,44 @@ const getUserDetails = async (req, res) => {
 };
 
 const updateUserDetails = async (req, res) => {
-  const { formData, user } = req.body; // Destructure formData and user
+  const { username, email, contactNumber, address } = req.body;
+  const userId = req.headers.id;
 
-  if (!user || !user.id) {
-    console.log("Error: User ID is required.");
-    return res.status(400).json({
-      success: false,
-      message: "User ID is required",
-    });
+  if (!userId) {
+    return res.status(400).json({ success: false, message: "User ID is required" });
   }
 
   try {
-    const updatedUser = await User.findByIdAndUpdate(
-      user.id,
-      {
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-        contactNumber: formData.contactNumber,
-        address: formData.address,
-        profilePicture: formData.profilePicture,
-      },
-      { new: true, runValidators: true } // Ensure updated data is returned and validators run
-    );
-
-    if (!updatedUser) {
-      console.log(`User with ID ${user.id} not found.`);
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+    const foundUser = await User.findById(userId);
+    if (!foundUser) {
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    console.log("User details updated successfully:", updatedUser);
+    if (email && email !== foundUser.email) {
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ success: false, message: "Email already in use" });
+      }
+    }
+
+    const profilePicture = req.file
+      ? `/uploads/${req.file.filename}`
+      : `/uploads/default-profile.jpg`;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { username, email, contactNumber, address, profilePicture },
+      { new: true, runValidators: true }
+    );
+
     res.status(200).json({
       success: true,
-      message: "User details updated successfully.",
+      message: "User details updated successfully",
       data: updatedUser,
     });
   } catch (error) {
     console.error("Error updating user details:", error);
-    res.status(500).json({
-      success: false,
-      message: "An error occurred while updating user details.",
-      error: error.message,
-    });
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
 
@@ -476,12 +514,102 @@ const viewveterinary = async (req, res) => {
   }
 };
 
+const payment=async (req,res)=>{
+  try {
+    const { userid, donationid, nameOnCard,amount, cardNumber, expiryDate, cvv } = req.body;
 
+    if(!userid || !donationid|| !nameOnCard|| !cardNumber|| !expiryDate|| !amount || !cvv){
+      console.log("Some data is missing payments.");
+      return res.status(404).json({
+        success: false,
+        message: "Some data is missing to store payments",
+      });
+    }
 
+    const newPayment = await Payment.create({
+      userid,
+      donationid,
+      nameOnCard,
+      cardNumber,
+      expiryDate,
+      cvv,
+      amount
+    });
 
+    res.status(200).json({ 
+      success: true,
+      message: "Payment details saved successfully!",
+      paymentdets:newPayment
+    });
+  } catch (error) {
+    console.error("Error saving payment details:", error);
+    res.status(500).json({
+      success: false, 
+      message: "Failed to save payment details." 
+    });
+  }
+}
+
+const generateInvoice=async (req, res)=>{
+    const { userid, donationid, amount, date, nameOnCard } = req.body;
+  
+    // Invoice Data
+    const invoiceData = {
+      sender: {
+        company: "Your Organization Name",
+        address: "123 Donation Street",
+        zip: "12345",
+        city: "Charity City",
+        country: "CharityLand",
+        custom1: "Thank you for your donation!",
+      },
+      client: {
+        name: nameOnCard,
+        id: userid,
+        custom1: `Donation ID: ${donationid}`,
+      },
+      information: {
+        date: date,
+        number: donationid,
+      },
+      products: [
+        {
+          quantity: 1,
+          description: "Donation",
+          price: amount,
+        },
+      ],
+      bottomNotice: "This is a system-generated invoice. Thank you for your support!",
+    };
+  
+    try {
+      // Generate PDF
+      const invoice = await easyinvoice.createInvoice(invoiceData);
+      const fileName = `Invoice_${donationid}.pdf`;
+      const filePath = path.join(__dirname, fileName);
+  
+      // Save invoice as a PDF file
+      fs.writeFileSync(filePath, invoice.pdf, "base64");
+  
+      // Send the file as a response for download
+      res.download(filePath, fileName, (err) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send("Error downloading the invoice");
+        } else {
+          // Optional: Delete the file after sending to save space
+          fs.unlinkSync(filePath);
+        }
+      });
+    } catch (error) {
+      console.error("Error generating invoice:", error);
+      res.status(500).send("Failed to generate invoice");
+    }
+}
 
 module.exports = {
-  signup, login, gallery, addDonation, addRescue, getUserDetails, updateUserDetails, viewpets, pets, vaccination, veterinary, adopt, viewveterinary,search
+  signup, login, gallery, addDonation, addRescue, getUserDetails, updateUserDetails, viewpets, pets, vaccination, veterinary, adopt, viewveterinary,search,displayDonation,rescuedPets,payment,getDonation,
+  generateInvoice
 }
 
 

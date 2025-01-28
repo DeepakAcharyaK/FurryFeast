@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-const userControllers=require('../controllers/userControllers')
+
+const userControllers=require('../controllers/userControllers');
+
+const upload = require('../middlewares/upload');
 
 router.post('/signup',userControllers.signup)
 
@@ -13,11 +16,17 @@ router.get('/gallery',userControllers.gallery)
 
 router.post('/adddonation',userControllers.addDonation)
 
-router.post('/addrescue',userControllers.addRescue)
+router.get('/donations/:userid',userControllers.displayDonation)
+
+router.get('/getdonationdets/:donationid',userControllers.getDonation)
+
+router.post('/addrescue',upload.single('image'),userControllers.addRescue)
+
+router.get('/addrescue',userControllers.rescuedPets)
 
 router.get('/getuserdetails',userControllers.getUserDetails)
 
-router.put('/updateuserdetails',userControllers.updateUserDetails)
+router.put("/updateuserdetails", upload.single("avatar"), userControllers.updateUserDetails);
 
 router.get('/viewpets',userControllers.viewpets)
 
@@ -30,6 +39,11 @@ router.get('/veterinary/:id',userControllers.veterinary)
 router.put('/pets/:id/adopt',userControllers.adopt)
 
 router.get('/viewveterinary',userControllers.viewveterinary)
+
+router.post('/payment/save',userControllers.payment)
+
+router.post('/generate-invoice',userControllers.generateInvoice)
+
 
 // router.get('/logout',userControllers.logout)
 

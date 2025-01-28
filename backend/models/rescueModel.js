@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
 
 const rescueSchema =new mongoose.Schema({
-  rescuedby: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Volunteer",
-    required: false,
-  },
+  // rescuedby: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "Volunteer",
+  //   required: false,
+  // },
   rescueinfoby: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: false,
+    required: true,
   },
   rescuetitle:{
     type:String,

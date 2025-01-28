@@ -6,7 +6,7 @@ const connectDB = require('./config/dbconnection');
 const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const cookieParser = require("cookie-parser");
-
+const path = require("path");
 
 app.use(cookieParser());
 dotenv.config();
@@ -15,6 +15,11 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+
+app.use(express.urlencoded({ extended: true }));
+
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
 
 // Database Connection
 connectDB()
