@@ -7,7 +7,7 @@ import { ToastContainer,toast } from "react-toastify";
 import Navbar from '../../components/Navbar'
 
 const PetDetails = () => {
-  const { id } = useParams();
+  const { id,userid } = useParams();
   const [pet, setPet] = useState(null);
   const [vaccinations, setVaccinations] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -41,17 +41,16 @@ const PetDetails = () => {
 
   const handleAdoptpet = async (id) => {
     try {
-      const response = await axios.put(`http://localhost:3000/user/pets/${id}/adopt`, {
-        adoptionStatus: "Pending", 
-      });
+      const response = await axios.put(`http://localhost:3000/user/${userid}/pets/${id}/adopt`);
       if(response.status===200){
         toast.success("Adoption process initiated successfully! Kinldy check status for future updates..");
         console.log('adoption status:',response);
-        setPet(response.data.data);
+        console.log(response.data.pet)
+        setPet(response.data.pet);
       }
     } catch (error) {
-      err.status === 404 && toast.warn(err.response.data.message);
-      err.status === 500 && toast.error(err.response.data.message);
+      error.status === 404 && toast.warn(error.response.data.message);
+      error.status === 500 && toast.error(error.response.data.message);
       console.error("Error during the adoption process:", error);
 
     }

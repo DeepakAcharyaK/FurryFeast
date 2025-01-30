@@ -53,6 +53,7 @@ const Navbar = () => {
                 <li onClick={() => navigate(`/user/${userid}/adopt/pets`)}>Adopt</li>
                 <li onClick={() => navigate(`/user/${userid}/pets/rescue`)}>Rescue</li>
                 <li onClick={() => navigate(`/user/${userid}/make-a-donation`)}>Donation</li>
+                <li onClick={() => navigate(`/user/${userid}/view-available-works`)}>Works</li>
               </ul>
             </menu>
           </>

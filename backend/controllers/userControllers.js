@@ -12,6 +12,8 @@ const Veterinary = require('../models/veterinaryModel');
 const Pet = require('../models/petModel');
 const Rescue = require('../models/rescueModel');
 const Payment = require('../models/paymentModel');
+const Petrequest = require('../models/petRequestModel');
+
 
 const signup = async (req, res) => {
   const { username, email, password } = req.body;
@@ -166,8 +168,44 @@ const addDonation = async (req, res) => {
 const displayDonation=async(req,res)=>{
   const { userid } = req.params;
   try {
-    const donations = await Donation.find({ donatedby: userid });
+    const donations = await Donation.find({ donatedby: userid }).populate('donatedby');
     res.status(200).json({ success: true, donations });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+const updateDonation=async(req,res)=>{
+  try {
+    const {donationid}=req.params;
+
+    const upDonation = await Donation.findByIdAndUpdate(donationid,{
+      status:'Success'
+    },{
+      new:true
+    });
+
+    console.log("Donation details updated successfully:", upDonation);
+    res.status(200).json({
+      success: true,
+      message: "Donation details updated successfully.",
+      upDonation
+    });
+  } catch (error) {
+    console.error("Error updated donation details:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while updated the donation details.",
+      error: error.message,
+    });
+  }
+}
+
+const displayPayment=async(req,res)=>{
+  const { userid } = req.params;
+  try {
+    const Payments = await Payment.find({ userid: userid })
+    res.status(200).json({ success: true, Payments });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -257,10 +295,47 @@ const addRescue = async (req, res) => {
   }
 };
 
+const rescueinfoPets=async(req,res)=>{
+  const { userid } = req.params;
+  try {
+    const rescues = await Rescue.find({ rescueinfoby: userid }).populate('rescueinfoby');
+    res.status(200).json({ success: true, rescues });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+const manageStatus = async (req, res) => {
+  const { rescueid } = req.params;
+  const action = req.body.action;
+
+  let updateData = {};
+
+  if (action === "done") {
+    updateData.status = "Completed";
+  } else if (action === "cancel") {
+    updateData.status = "Pending";
+    updateData.rescuedby = null; // Remove rescuedby reference
+  }
+
+  try {
+    const updatedRescue = await Rescue.findByIdAndUpdate(
+      rescueid,
+      { $set: updateData },  // Using `$set` to update only the required fields
+      { new: true }
+    );
+
+    res.status(200).json({ success: true, updatedRescue });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 const rescuedPets=async(req,res)=>{
   const { userid } = req.params;
   try {
-    const rescues = await Rescue.find({ rescueinfoby: userid });
+    const rescues = await Rescue.find({ rescuedby: userid })
+
     res.status(200).json({ success: true, rescues });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -365,6 +440,36 @@ const viewpets = async (req, res) => {
   }
 };
 
+const getUserAdoptedPets=async(req,res)=>{
+  try {
+    const {userid}=req.params;
+
+    const alladoptedpets = await Petrequest.find({userId:userid}).populate('petId').populate('userId');
+
+    if (!pets || pets.length === 0) {
+      console.log("No pets found.");
+      return res.status(404).json({
+        success: false,
+        message: "No pets found.",
+      });
+    }
+
+    console.log("Pets fetched successfully for user:",`${userid}`, pets);
+    res.status(200).json({
+      success: true,
+      message: "Pets fetched successfully.",
+      alladoptedpets,
+    });
+  } catch (error) {
+    console.error("Error fetching pets:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching pets.",
+      error: error.message,
+    });
+  }
+}
+
 const pets = async (req, res) => {
   try {
     const pet = await Pet.findById(req.params.id);
@@ -452,15 +557,10 @@ const vaccination = async (req, res) => {
 };
 
 const adopt = async (req, res) => {
-  const { id } = req.params;
-  const { adoptionStatus } = req.body;
+  const { id ,userid} = req.params;
 
   try {
-    const pet = await Pet.findByIdAndUpdate(
-      id,
-      { adoptionStatus },
-      { new: true }
-    );
+    const pet = await Pet.findById(id);
 
     if (!pet) {
       console.log(`Pet with ID ${id} not found.`);
@@ -470,12 +570,28 @@ const adopt = async (req, res) => {
       });
     }
 
-    console.log(`Pet adoption status updated successfully for pet with ID ${id}:`, pet);
-    res.status(200).json({
-      success: true,
-      message: "Pet adoption status updated successfully.",
-      data: pet,
-    });
+    if(pet.adoptionStatus==='Available'){
+      const newPetRequest = await Petrequest.create({
+            userId:userid,
+            petId:id,
+      })
+
+      const pet = await Pet.findByIdAndUpdate(id,{
+        adoptionStatus:'Pending'
+      },{
+        new:true
+      })
+
+      console.log(`Pet adoption status updated successfully for pet with ID ${id}:`, pet);
+
+      res.status(200).json({
+        success: true,
+        message: "Pet adoption status updated successfully.",
+        newPetRequest,
+        pet
+      });
+    }
+   
   } catch (error) {
     console.error("Error updating pet adoption status:", error);
     res.status(500).json({
@@ -607,9 +723,37 @@ const generateInvoice=async (req, res)=>{
     }
 }
 
+const allWorks= async (req, res) => {
+  try {
+    const rescues = await Rescue.find().populate("rescueinfoby"); 
+
+    res.json(rescues);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+const manageWork=async(req,res)=>{
+    try {
+      const {id,userid}=req.params;
+
+      const rescue = await Rescue.findByIdAndUpdate(id,{
+        rescuedby:userid,
+        status :"InProgress"
+      },{new:true});
+
+      if (!rescue) return res.status(404).json({ error: "Rescue work not found" });
+
+      res.json({ message: "Work status updated to InProgress", rescue });
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+}
+
 module.exports = {
-  signup, login, gallery, addDonation, addRescue, getUserDetails, updateUserDetails, viewpets, pets, vaccination, veterinary, adopt, viewveterinary,search,displayDonation,rescuedPets,payment,getDonation,
-  generateInvoice
+  signup, login, gallery, addDonation, addRescue, getUserDetails, updateUserDetails, viewpets, pets, vaccination, veterinary, adopt, viewveterinary,search,displayDonation,rescueinfoPets,rescuedPets,payment,getDonation,manageStatus,
+  generateInvoice,displayPayment,updateDonation,getUserAdoptedPets,allWorks,
+  manageWork
 }
 
 

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import axios from "axios";
 import {
   Box,
   Typography,
+  CircularProgress,
   Paper,
   Table,
   TableBody,
@@ -11,15 +11,12 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  CircularProgress,
-  Card,
-  CardMedia,
-  CardContent,
 } from "@mui/material";
+import Navbar from "../../components/Navbar";
 
-const RescuedPets = () => {
-  const { userid } = useParams();
+const RescuedPets = ({ userid }) => {
   const [rescues, setRescues] = useState([]);
+  const [user, setuser] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -27,9 +24,11 @@ const RescuedPets = () => {
     const fetchRescues = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/api/rescues/${userid}`
+          `http://localhost:3000/user/rescued/${userid}`
         );
         setRescues(response.data.rescues);
+        // setuser(response.data.rescues[0].rescueinfoby.username)
+
         setLoading(false);
       } catch (err) {
         setError(err.message || "Failed to fetch rescued pets.");
@@ -65,53 +64,122 @@ const RescuedPets = () => {
     );
   }
 
-  return (
-    <Box sx={{ padding: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Rescued Pets
-      </Typography>
+  const handleAction=async(rescueid,action)=>{
+    const response = await axios.patch(`http://localhost:3000/user/rescue/${rescueid}`,{action});
+  }
 
-      {rescues.length === 0 ? (
-        <Typography variant="body1" sx={{ marginTop: 2 }}>
-          No rescued pets found.
+  return (
+    <>
+      <Navbar />
+      <Box sx={{ padding: 4 }}>
+        <Typography variant="h5" fontWeight={600} gutterBottom>
+          All Rescued Pets
         </Typography>
-      ) : (
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-          {rescues.map((rescue) => (
-            <Card key={rescue._id} sx={{ width: 300 }}>
-              {rescue.image && (
-                <CardMedia
-                  component="img"
-                  height="140"
-                  image={rescue.image}
-                  alt={rescue.rescuetitle}
-                />
-              )}
-              <CardContent>
-                <Typography variant="h6" component="div">
-                  {rescue.rescuetitle}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <strong>Location:</strong> {rescue.location}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <strong>Status:</strong> {rescue.status}
-                </Typography>
-                {rescue.description && (
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ marginTop: 1 }}
-                  >
-                    {rescue.description}
-                  </Typography>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </Box>
-      )}
-    </Box>
+
+        {rescues.length === 0 ? (
+          <Typography variant="body1" sx={{ marginTop: 2 }}>
+            No rescued pets found.
+          </Typography>
+        ) : (
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: "#c8cfcb" }}>
+                  <TableCell>Sl.No</TableCell>
+                  <TableCell>Image</TableCell>
+                  <TableCell>Location</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Title</TableCell>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Time</TableCell>
+                  <TableCell>Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rescues.map((rescue, index) => (
+                  <TableRow key={rescue._id}>
+                    <TableCell>{index + 1}</TableCell>
+                    {
+                      (rescue.image != null) ?
+                        <TableCell
+                          sx={{ cursor: "pointer", color: "blue", textDecoration: "underline" }}
+                          onClick={() => window.open(`http://localhost:3000${rescue.image}`, "_blank")}
+                        >
+                          View
+                        </TableCell>
+                        :
+                        <TableCell>Not Available</TableCell>
+
+                    }
+                    <TableCell>{rescue.location}</TableCell>
+                    <TableCell>
+                      <span style={{
+                        backgroundColor:
+                          rescue.status === 'Completed'
+                            ? '#8df2a8 '
+                            : rescue.status === 'InProgress'
+                              ? '#fff9c4'
+                              : '#c8e6c9',
+                        color:
+                          rescue.status === 'Completed'
+                            ? '#3c6e49'
+                            : rescue.status === 'InProgress'
+                              ? '#f57f17'
+                              : '#2e7d32',
+                        padding: '2px 8px',
+                        borderRadius: '8px',
+                      }}>{rescue.status}</span>
+                    </TableCell>
+                    <TableCell>{rescue.rescuetitle}</TableCell>
+                    <TableCell>
+                      {new Date(rescue.createdAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(rescue.createdAt).toLocaleTimeString()}
+                    </TableCell>
+
+                    {
+                      rescue.status != 'Completed' && (
+                        <TableCell>
+                          <button
+                            onClick={() => handleAction(rescue._id, "done")}
+                            style={{
+                              backgroundColor: "#289e2b",
+                              color: "white",
+                              padding: "5px 10px",
+                              border: "none",
+                              borderRadius: "5px",
+                              cursor: "pointer",
+                              marginRight: "5px"
+                            }}
+                          >
+                            Done
+                          </button>
+
+                          <button
+                            onClick={() => handleAction(rescue._id, "cancel")}
+                            style={{
+                              backgroundColor: "#eb5468",
+                              color: "white",
+                              padding: "5px 10px",
+                              border: "none",
+                              borderRadius: "5px",
+                              cursor: "pointer"
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        </TableCell>
+                      )
+                    }
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </Box>
+    </>
   );
 };
 

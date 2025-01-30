@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
 
 const rescueSchema =new mongoose.Schema({
-  // rescuedby: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: "Volunteer",
-  //   required: false,
-  // },
+  rescuedby: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
   rescueinfoby: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -24,7 +23,7 @@ const rescueSchema =new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["Pending", "In Progress", "Completed", "Cancelled"],
+    enum: ["Pending", "Completed", "Cancelled"],
     default: "Pending",
   },
   image:{

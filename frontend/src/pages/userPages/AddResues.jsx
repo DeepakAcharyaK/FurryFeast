@@ -6,6 +6,7 @@ import { toast, ToastContainer } from "react-toastify";
 import Navbar from '../../components/Navbar';
 
 const AddRescues = ({ userid }) => {
+  console.log(userid)
   const [formData, setformData] = useState({
     rescuetitle: "",
     location: "",

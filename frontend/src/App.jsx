@@ -13,6 +13,7 @@ import AddResues from './pages/userPages/AddResues';
 import Settings from './pages/userPages/Settings';
 import ViewAdoptPets from './pages/userPages/ViewAdoptPets';
 import ViewGallery from './pages/userPages/ViewGallery';
+import ViewWorks from './pages/userPages/ViewWorks';
 import ViewVeterinary from './pages/userPages/ViewVeterinary';
 import PetDetails from './pages/userPages/PetDetails';
 import Profile from './pages/userPages/Profile';
@@ -23,6 +24,7 @@ import RescuedPets from './pages/userPages/RescuedPets';
 //admin
 import ManageDonation from './pages/adminPages/ManageDonation'
 import Payment from './pages/userPages/Payment';
+import AllRescueInfo from './pages/userPages/AllRescueInfo';
 
 
 function App() {
@@ -59,14 +61,16 @@ function App() {
                 <Route path="/user/:userid/make-a-donation" element={<AddDonations userid={userid}/>} />
                 <Route path="/user/:userid/donation/:donationid/payment/type/details" element={<Payment userid={userid}/>} />
                 <Route path="/user/:userid/view-gallery" element={<ViewGallery />} />
+                <Route path="/user/:userid/view-available-works" element={<ViewWorks userid={userid} />} />
                 <Route path="/user/:userid/pets/rescue" element={<AddResues userid={userid} />} />
                 <Route path="/user/:userid/adopt/pets" element={<ViewAdoptPets userid={userid}/>} />
                 <Route path="/user/:userid/view-veterinary" element={<ViewVeterinary />} />
                 <Route path="/user/:userid/adopt/pets/petdetails/:id" element={<PetDetails />} />
                 <Route path="/user/:userid/profile/settings" element={<Settings />} />
-                <Route path="/user/:userid/all/donations/made-by/:userid" element={<DonationsMade />} />
-                <Route path="/user/:userid/all/rescued/pets-by/:userid" element={<AdoptedPets />} />
-                <Route path="/user/:userid/all/adopted/pets-by/:userid" element={<RescuedPets />} />
+                <Route path="/user/:userid/all/donations/made-by/:userid" element={<DonationsMade userid={userid} />} />
+                <Route path="/user/:userid/all/rescued/pets-by/:userid" element={<RescuedPets userid={userid} />} />
+                <Route path="/user/:userID/all/rescue/information/given-by/:userID" element={<AllRescueInfo userid={userid} />} />
+                <Route path="/user/:userid/all/adopted/pets-by/:userid" element={<AdoptedPets userid={userid} />} /> 
 
               </>
             )}

@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
-import {Box,Typography,Paper,Table,TableBody,TableCell,TableContainer,TableHead,TableRow,CircularProgress} from "@mui/material";
+import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress } from "@mui/material";
 
 import Navbar from '../../components/Navbar'
 
-const DonationsMade = () => {
-  const { userid } = useParams();
+const DonationsMade = ({userid}) => {
+  const navigate=useNavigate()
 
   const [donations, setDonations] = useState([]);
+  const [user, setuser] = useState('');
+  // const [payments, setPayments] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -19,7 +21,15 @@ const DonationsMade = () => {
         const response = await axios.get(
           `http://localhost:3000/user/donations/${userid}`
         );
+
+        // const paymentres = await axios.get(
+        //   `http://localhost:3000/user/payment/${userid}`
+        // );
+
         setDonations(response.data.donations);
+        setuser(response.data.donations[0].donatedby.username)
+        // setPayments(paymentres.data.Payments);
+
         setLoading(false);
       } catch (err) {
         toast.error('')
@@ -62,8 +72,8 @@ const DonationsMade = () => {
       <Navbar />
 
       <Box sx={{ padding: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Donations Made
+        <Typography variant="h5" fontWeight={600} gutterBottom>
+          All Donations made by <span style={{ color:'#0a6569'}}>{user}</span> 
         </Typography>
 
         {donations.length === 0 ? (
@@ -74,27 +84,56 @@ const DonationsMade = () => {
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
-                <TableRow>
+                <TableRow sx={{backgroundColor:'#c8cfcb'}}>
                   <TableCell>Donor Name</TableCell>
                   <TableCell>Contact</TableCell>
                   <TableCell>Amount</TableCell>
-                  <TableCell>Currency</TableCell>
                   <TableCell>Description</TableCell>
                   <TableCell>Status</TableCell>
+                  <TableCell>Action</TableCell>
                   <TableCell>Date</TableCell>
+                  <TableCell>Time</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {donations.map((donation) => (
+
+                {donations.map((donation, index) => (
                   <TableRow key={donation._id}>
                     <TableCell>{donation.donorname}</TableCell>
                     <TableCell>{donation.contact}</TableCell>
-                    <TableCell>{donation.amount}</TableCell>
-                    <TableCell>{donation.currency}</TableCell>
+                    <TableCell>Rs. {donation.amount}</TableCell>
                     <TableCell>{donation.description}</TableCell>
-                    <TableCell>{donation.status}</TableCell>
                     <TableCell>
-                      {new Date(donation.donationdate).toLocaleDateString()}
+                      <span style={{
+                        backgroundColor:
+                          donation.status === 'Success'
+                            ? '#8df2a8 '
+                            : donation.status === 'Pending'
+                              ? '#fff9c4'
+                              : '#c8e6c9',
+                        color:
+                          donation.status === 'Success'
+                            ? '#3c6e49'
+                            : donation.status === 'Pending'
+                              ? '#f57f17'
+                              : '#2e7d32',
+                        padding: '2px 8px',
+                        borderRadius: '8px',
+                      }}>{donation.status}</span>
+                    </TableCell>
+                    <TableCell>
+                      {
+                        (donation.status === 'Success') ?
+                          <Typography sx={{backgroundColor:'orange',color:'white',cursor:'pointer', padding: '2px 8px',borderRadius: '8px'}} onClick={()=>navigate('')} variant='p'>Download</Typography>
+                        :
+                          <Typography sx={{backgroundColor:'green',color:'white',cursor:'pointer', padding: '2px 8px',borderRadius: '8px'}} onClick={()=>navigate(`/user/${userid}/donation/${donation._id}/payment/type/details`)} variant='p'>PayNow</Typography>
+                      }
+                    </TableCell>
+                    <TableCell>
+                      {new Date(donation.updatedAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                    {new Date(donation.updatedAt).toLocaleTimeString()}
                     </TableCell>
                   </TableRow>
                 ))}

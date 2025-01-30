@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Box,
@@ -12,127 +12,170 @@ import {
   TextField,
   IconButton,
 } from "@mui/material";
+import { CiLocationOn } from "react-icons/ci";
 import { Visibility, Search } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Navbar from "../../components/Navbar";
 
-const workData = [
-  {
-    id: 1,
-    title: "Rescue Mission in City Park",
-    description: "Rescued 5 stray dogs and provided immediate care.",
-    date: "2025-01-01",
-    image: "/work1.jpg",
-  },
-  {
-    id: 2,
-    title: "Community Adoption Drive",
-    description: "Organized an adoption event for 20 rescued pets.",
-    date: "2024-12-15",
-    image: "/work2.jpg",
-  },
-  {
-    id: 3,
-    title: "Vaccination Camp",
-    description: "Vaccinated over 50 pets against common diseases.",
-    date: "2024-11-20",
-    image: "/work3.jpg",
-  },
-];
+const ViewWorks = ({ userid }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [workData, setWorkData] = useState([]);
+  const navigate = useNavigate();
 
-const ViewWorks = () => {
-  const [searchTerm, setSearchTerm] = React.useState("");
+  // Fetch rescue works from API
+  useEffect(() => {
+    const fetchWorks = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/user/rescues");
+        setWorkData(response.data);
+        console.log(response.data)
+      } catch (error) {
+        console.error("Error fetching rescue works:", error);
+      }
+    };
+
+    fetchWorks();
+  }, []);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
+  const handleTakeWork = async (id) => {
+    try {
+      await axios.put(`http://localhost:3000/user/rescues/${id}/take/${userid}`);
+      setWorkData((prevWorkData) =>
+        prevWorkData.map((work) =>
+          work._id === id ? { ...work, status: "InProgress" } : work
+        )
+      );
+    } catch (error) {
+      console.error("Error updating work status:", error);
+    }
+  };
+
   const filteredWorkData = workData.filter((work) =>
-    work.title.toLowerCase().includes(searchTerm.toLowerCase())
+    work.rescuetitle.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <Container maxWidth="lg">
-      {/* Page Header */}
-      <Box mb={4} textAlign="center">
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
-          View Work
-        </Typography>
-        <Typography variant="subtitle1" color="textSecondary">
-          Browse the list of all completed and ongoing works
-        </Typography>
-      </Box>
-
-      {/* Search Bar */}
-      <Box mb={4} display="flex" justifyContent="center" alignItems="center">
-        <TextField
-          variant="outlined"
-          placeholder="Search work..."
-          size="small"
-          value={searchTerm}
-          onChange={handleSearchChange}
-          sx={{ width: "50%" }}
-          InputProps={{
-            endAdornment: (
-              <IconButton>
-                <Search />
-              </IconButton>
-            ),
-          }}
-        />
-      </Box>
-
-      {/* Work Grid */}
-      <Grid container spacing={4}>
-        {filteredWorkData.map((work) => (
-          <Grid item xs={12} sm={6} md={4} key={work.id}>
-            <Card elevation={3} sx={{ height: "100%" }}>
-              {/* Work Image */}
-              <CardMedia
-                component="img"
-                height="180"
-                image={work.image}
-                alt={work.title}
-              />
-
-              {/* Work Content */}
-              <CardContent>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>
-                  {work.title}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  {work.description.length > 100
-                    ? work.description.substring(0, 100) + "..."
-                    : work.description}
-                </Typography>
-                <Typography variant="caption" color="textSecondary" mt={1}>
-                  Date: {work.date}
-                </Typography>
-              </CardContent>
-
-              {/* Actions */}
-              <CardActions>
-                <Button
-                  size="small"
-                  variant="contained"
-                  startIcon={<Visibility />}
-                  onClick={() => alert(`Viewing details for: ${work.title}`)}
-                >
-                  View Details
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-
-      {/* No Results Found */}
-      {filteredWorkData.length === 0 && (
-        <Box mt={4} textAlign="center">
-          <Typography variant="h6" color="textSecondary">
-            No work found matching your search.
+    <>
+      <Navbar />
+      <Container maxWidth="lg">
+        <Box m={4} textAlign="center">
+          <Typography variant="h4" fontWeight={600} gutterBottom>
+            Work for 🐕‍🦺Pets❤️, Not for🙅us
+          </Typography>
+          <Typography variant="h6" my={2} textAlign="center" color="gray">
+            Giving every pet a second chance at love and care.
           </Typography>
         </Box>
-      )}
-    </Container>
+
+        <Box mb={4} display="flex" justifyContent="center">
+          <TextField
+            variant="outlined"
+            placeholder="Search work..."
+            size="small"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            sx={{
+              width: "40%",
+              borderRadius: "25px",
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "25px",
+              },
+            }}
+            InputProps={{
+              endAdornment: (
+                <IconButton>
+                  <Search />
+                </IconButton>
+              ),
+            }}
+          />
+        </Box>
+
+        <Grid container spacing={4}>
+          {filteredWorkData.length > 0 ? (
+            filteredWorkData.map((work) => {
+              const url = work.image
+              console.log(url)
+              return (
+                <Grid item xs={12} sm={6} md={4} key={work._id}>
+                  <Card
+                    sx={{
+                      borderRadius: "15px",
+                      boxShadow: "0 5px 15px rgba(0,0,0,0.2)"
+                    }}
+                  >
+                    <CardMedia component="img" height="250" image={`http://localhost:3000${url}` || "/placeholder.jpg"} alt={work.rescuetitle} />
+                    <CardContent>
+                      <Typography variant="h6" fontWeight={500} >
+                        {work.rescuetitle}
+                      </Typography>
+                      <Typography variant="h6" fontWeight={600}>
+                        <CiLocationOn />{work.location}
+                      </Typography>
+                      {/* <Typography variant="h6" fontWeight={600}> */}
+                      {console.log(work.rescueinfoby)}
+                      {/* </Typography> */}
+                      <Typography variant="caption" display="block" mt={1}>
+                        Date: {new Date(work.createdAt).toLocaleDateString()}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        display="block"
+                        sx={{
+                          mt: 1,
+                          backgroundColor:
+                            work.status === "Completed"
+                              ? "#c8e6c9"
+                              : work.status === "InProgress"
+                                ? "#fff9c4"
+                                : "#fdd835",
+                          color:
+                            work.status === "Completed"
+                              ? "#2e7d32"
+                              : work.status === "InProgress"
+                                ? "#f57f17"
+                                : "#d84315",
+                          padding: "2px 8px",
+                          borderRadius: "8px",
+                          display: "inline-block",
+                        }}
+                      >
+                        {work.status}
+                      </Typography>
+                    </CardContent>
+                    {
+                      work.status != 'Completed' && (
+                        <CardActions>
+                          <Button
+                            size="small"
+                            variant="contained"
+                            disabled={work.status === "InProgress"}
+                            onClick={() => handleTakeWork(work._id)}
+                          >
+                            {work.status === "InProgress" ? "In Progress" : "Take Work"}
+                          </Button>
+                        </CardActions>
+                      )
+                    }
+                  </Card>
+                </Grid>
+              )
+            })
+          ) : (
+            <Box mt={4} textAlign="center" width="100%">
+              <Typography variant="h6" color="gray">
+                No work found matching your search.
+              </Typography>
+            </Box>
+          )}
+        </Grid>
+      </Container>
+    </>
   );
 };
 

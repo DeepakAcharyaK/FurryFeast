@@ -16,13 +16,19 @@ router.get('/gallery',userControllers.gallery)
 
 router.post('/adddonation',userControllers.addDonation)
 
-router.get('/donations/:userid',userControllers.displayDonation)
+router.get('/donations/:userid',userControllers.displayDonation) 
+
+router.patch('/donation/:donationid/update',userControllers.updateDonation) 
+
+router.get('/payment/:userid',userControllers.displayPayment) 
 
 router.get('/getdonationdets/:donationid',userControllers.getDonation)
 
 router.post('/addrescue',upload.single('image'),userControllers.addRescue)
 
-router.get('/addrescue',userControllers.rescuedPets)
+router.get('/rescue/:userid',userControllers.rescueinfoPets)
+
+router.get('/rescued/:userid',userControllers.rescuedPets)
 
 router.get('/getuserdetails',userControllers.getUserDetails)
 
@@ -32,11 +38,13 @@ router.get('/viewpets',userControllers.viewpets)
 
 router.get('/pets/:id',userControllers.pets)
 
+router.get('/adoptedPets/:userid',userControllers.getUserAdoptedPets)
+
 router.get('/vaccinations/:id',userControllers.vaccination)
 
 router.get('/veterinary/:id',userControllers.veterinary)
 
-router.put('/pets/:id/adopt',userControllers.adopt)
+router.put('/:userid/pets/:id/adopt',userControllers.adopt)
 
 router.get('/viewveterinary',userControllers.viewveterinary)
 
@@ -44,6 +52,11 @@ router.post('/payment/save',userControllers.payment)
 
 router.post('/generate-invoice',userControllers.generateInvoice)
 
+router.get('/rescues',userControllers.allWorks)
+
+router.put('/rescues/:id/take/:userid',userControllers.manageWork)
+
+router.patch('/rescue/:rescueid',userControllers.manageStatus)
 
 // router.get('/logout',userControllers.logout)
 

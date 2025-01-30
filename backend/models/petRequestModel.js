@@ -1,14 +1,6 @@
 const mongoose = require('mongoose');
 
 const petRequestSchema = new mongoose.Schema({
-    name:{
-        type:String,
-        required:[true, "Please enter a name"]
-    },
-    contact:{
-        type:String,
-        required:[true, "Please enter the contact"]
-    },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -26,8 +18,7 @@ const petRequestSchema = new mongoose.Schema({
     },
     requestdate:{
         type:Date,
-        default:Date.now,
-        required:[true,]
+        default:Date.now
     },
 },{
     timestamps:true

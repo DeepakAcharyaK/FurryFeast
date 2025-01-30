@@ -92,6 +92,8 @@ function Payment({ userid }) {
     }
 
     try {
+      const newDonation = await axios.patch(`http://localhost:3000/user/donation/${donationid}/update`);
+
       const response = await axios.post("http://localhost:3000/user/payment/save", formData);
       if (response.status === 200) {
         toast.success("Payment Confirmed and Details Saved!");

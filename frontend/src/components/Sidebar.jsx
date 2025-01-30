@@ -66,6 +66,7 @@ const Sidebar = ({ userid, isOpen, toggleSidebar }) => {
     { text: "Donations made", icon: <FaDonate size={24} />, route: `/user/${userID}/all/donations/made-by/${userID}` },
     { text: "Adopted pets", icon: <GiDogHouse size={24} />, route: `/user/${userID}/all/adopted/pets-by/${userID}` },
     { text: "Rescued pets", icon: <MdOutlineLocalHospital size={24} />, route: `/user/${userID}/all/rescued/pets-by/${userID}` },
+    { text: "Rescue information", icon: <MdOutlineLocalHospital size={24} />, route: `/user/${userID}/all/rescue/information/given-by/${userID}` },
     { text: "Settings", icon: <FiSettings size={24} />, route: `/user/${userid}/profile/settings` },
   ];
 
