@@ -65,11 +65,11 @@ function App() {
                 <Route path="/user/:userid/pets/rescue" element={<AddResues userid={userid} />} />
                 <Route path="/user/:userid/adopt/pets" element={<ViewAdoptPets userid={userid}/>} />
                 <Route path="/user/:userid/view-veterinary" element={<ViewVeterinary />} />
-                <Route path="/user/:userid/adopt/pets/petdetails/:id" element={<PetDetails />} />
+                <Route path="/user/:userid/adopt/pets/petdetails/:id" element={<PetDetails userid={userid}/>} />
                 <Route path="/user/:userid/profile/settings" element={<Settings />} />
                 <Route path="/user/:userid/all/donations/made-by/:userid" element={<DonationsMade userid={userid} />} />
                 <Route path="/user/:userid/all/rescued/pets-by/:userid" element={<RescuedPets userid={userid} />} />
-                <Route path="/user/:userID/all/rescue/information/given-by/:userID" element={<AllRescueInfo userid={userid} />} />
+                <Route path="/user/:userid/all/rescue/information/given-by/:userid" element={<AllRescueInfo userid={userid} />} />
                 <Route path="/user/:userid/all/adopted/pets-by/:userid" element={<AdoptedPets userid={userid} />} /> 
 
               </>

@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
 const veterinarySchema =new mongoose.Schema({
-  petId:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'Pet'
-  },
   name: {
     type: String,
     required: [true, "Please enter the veterinarian's name"],
@@ -46,28 +42,7 @@ const veterinarySchema =new mongoose.Schema({
     default: 0,
     min: 0,
     max: 5,
-  },
-  reviews: [
-    {
-      userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', 
-      },
-      comment: {
-        type: String,
-        required: true,
-      },
-      rating: {
-        type: Number,
-        min: 0,
-        max: 5,
-      },
-      createdAt: {
-        type: Date,
-        default: Date.now,
-      },
-    },
-  ],
+  }
 },{
     timestamps:true
 });

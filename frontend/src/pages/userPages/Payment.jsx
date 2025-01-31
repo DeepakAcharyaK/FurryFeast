@@ -75,7 +75,7 @@ function Payment({ userid }) {
       link.click();
       link.remove();
   
-      alert("Invoice downloaded successfully!");
+      toast.success("Invoice Generated successfully!");
     } catch (error) {
       console.error("Error generating invoice:", error);
       alert("Failed to generate invoice.");

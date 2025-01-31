@@ -44,7 +44,7 @@
   line-height: 1.2;
   position: relative;
   z-index: 99;
-  mix-blend-mode: difference;
+  /* mix-blend-mode: difference; */
 }
 
 @media (min-width: 930px) {
@@ -191,4 +191,7 @@
   font-family: "Fredericka the Great", serif;
   font-weight: 500;
   font-style: normal;
+}
+.img-cont{
+  clip-path: polygon(100% 49%, 80% 49%, 80% 100%, 20% 100%, 20% 50%, 0 50%, 52% 0);
 }

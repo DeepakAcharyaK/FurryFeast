@@ -26,7 +26,7 @@ const Navbar = () => {
   const handleLogout = () => {
     window.localStorage.removeItem("isloggedin");
     window.localStorage.removeItem("role");
-    navigate("/");
+    window.open('/', '_self');
   };
 
   useEffect(() => {

@@ -20,22 +20,22 @@ const RescuedPets = ({ userid }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const fetchRescues = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/user/rescued/${userid}`
+      );
+      setRescues(response.data.rescues);
+      // setuser(response.data.rescues[0].rescueinfoby.username)
+
+      setLoading(false);
+    } catch (err) {
+      setError(err.message || "Failed to fetch rescued pets.");
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchRescues = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:3000/user/rescued/${userid}`
-        );
-        setRescues(response.data.rescues);
-        // setuser(response.data.rescues[0].rescueinfoby.username)
-
-        setLoading(false);
-      } catch (err) {
-        setError(err.message || "Failed to fetch rescued pets.");
-        setLoading(false);
-      }
-    };
-
     fetchRescues();
   }, [userid]);
 
@@ -66,6 +66,7 @@ const RescuedPets = ({ userid }) => {
 
   const handleAction=async(rescueid,action)=>{
     const response = await axios.patch(`http://localhost:3000/user/rescue/${rescueid}`,{action});
+    fetchRescues();
   }
 
   return (

@@ -107,7 +107,22 @@ const AllRescueInfo = ({userid}) => {
                     
                     }
                     <TableCell>{rescue.location}</TableCell>
-                    <TableCell>{rescue.status}</TableCell>
+                    <TableCell><span
+                          style={{
+                            backgroundColor:
+                            rescue.status === "Rescued"? 
+                                                  "#8df2a8"
+                                                  : rescue.status === "Pending"?
+                                                      "yellow"
+                                                      : rescue.status === "InProgress"?
+                                                           "#fff9c4"
+                                                            : "#c8e6c9",
+                            padding: "2px 8px",
+                            borderRadius: "8px",
+                          }}
+                        >
+                          {rescue.status}
+                        </span></TableCell>
                     <TableCell>{rescue.rescuetitle}</TableCell>
                     <TableCell>
                       {new Date(rescue.createdAt).toLocaleDateString()}

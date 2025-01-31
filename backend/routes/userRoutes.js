@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-
 const userControllers=require('../controllers/userControllers');
-
 const upload = require('../middlewares/upload');
 
 router.post('/signup',userControllers.signup)
@@ -57,11 +55,5 @@ router.get('/rescues',userControllers.allWorks)
 router.put('/rescues/:id/take/:userid',userControllers.manageWork)
 
 router.patch('/rescue/:rescueid',userControllers.manageStatus)
-
-// router.get('/logout',userControllers.logout)
-
-// router.get('/:id/works',userControllers.works)
-
-
 
 module.exports = router;

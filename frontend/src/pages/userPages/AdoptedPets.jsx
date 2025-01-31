@@ -112,7 +112,7 @@ const AdoptedPets = ({ userid }) => {
                     <TableRow key={_id}>
                       <TableCell>
                         <img
-                          src={image? image: '/images/no-image.jpg'}
+                          src={image? `http://localhost:3000${image}`: '/images/no-image.jpg'}
                           alt={name}
                           style={{ width: "80px", height: "80px", objectFit: "cover", borderRadius: "50%" }}
                         />

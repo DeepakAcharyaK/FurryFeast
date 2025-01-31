@@ -117,9 +117,12 @@ const ViewWorks = ({ userid }) => {
                       <Typography variant="h6" fontWeight={600}>
                         <CiLocationOn />{work.location}
                       </Typography>
-                      {/* <Typography variant="h6" fontWeight={600}> */}
-                      {console.log(work.rescueinfoby)}
-                      {/* </Typography> */}
+                      <Typography variant="body2" fontWeight={500}>
+                        Rescue information by: {work.rescueinfoby?.email || "N/A"}
+                      </Typography>
+                      <Typography variant="body2" fontWeight={500}>
+                        Rescued by: {work.rescuedby?.email || "N/A"}
+                      </Typography>
                       <Typography variant="caption" display="block" mt={1}>
                         Date: {new Date(work.createdAt).toLocaleDateString()}
                       </Typography>

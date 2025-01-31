@@ -30,10 +30,6 @@ const petSchema = mongoose.Schema({
          type:mongoose.Schema.Types.ObjectId,
          ref:'Vaccination',
     },
-    veterinary:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Veterinary',
-    },
     adoptionStatus: {
         type: String,
         enum: ["Available", "Adopted", "Pending"],

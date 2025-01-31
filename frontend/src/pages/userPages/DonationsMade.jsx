@@ -6,8 +6,8 @@ import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, Ta
 
 import Navbar from '../../components/Navbar'
 
-const DonationsMade = ({userid}) => {
-  const navigate=useNavigate()
+const DonationsMade = ({ userid }) => {
+  const navigate = useNavigate()
 
   const [donations, setDonations] = useState([]);
   const [user, setuser] = useState('');
@@ -73,7 +73,7 @@ const DonationsMade = ({userid}) => {
 
       <Box sx={{ padding: 4 }}>
         <Typography variant="h5" fontWeight={600} gutterBottom>
-          All Donations made by <span style={{ color:'#0a6569'}}>{user}</span> 
+          All Donations made by <span style={{ color: '#0a6569' }}>{user}</span>
         </Typography>
 
         {donations.length === 0 ? (
@@ -84,7 +84,7 @@ const DonationsMade = ({userid}) => {
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
-                <TableRow sx={{backgroundColor:'#c8cfcb'}}>
+                <TableRow sx={{ backgroundColor: '#c8cfcb' }}>
                   <TableCell>Donor Name</TableCell>
                   <TableCell>Contact</TableCell>
                   <TableCell>Amount</TableCell>
@@ -124,16 +124,28 @@ const DonationsMade = ({userid}) => {
                     <TableCell>
                       {
                         (donation.status === 'Success') ?
-                          <Typography sx={{backgroundColor:'orange',color:'white',cursor:'pointer', padding: '2px 8px',borderRadius: '8px'}} onClick={()=>navigate('')} variant='p'>Download</Typography>
-                        :
-                          <Typography sx={{backgroundColor:'green',color:'white',cursor:'pointer', padding: '2px 8px',borderRadius: '8px'}} onClick={()=>navigate(`/user/${userid}/donation/${donation._id}/payment/type/details`)} variant='p'>PayNow</Typography>
+                          <Typography
+                            sx={{
+                              backgroundColor: 'orange',
+                              color: 'white',
+                              cursor: 'pointer',
+                              padding: '2px 8px',
+                              borderRadius: '8px'
+                            }}
+                            onClick={() => window.open(`http://localhost:3000/uploads/pdf/Invoice_${donation._id}.pdf`, "_blank")}
+                            variant="p"
+                          >
+                            Download
+                          </Typography>
+                          :
+                          <Typography sx={{ backgroundColor: 'green', color: 'white', cursor: 'pointer', padding: '2px 8px', borderRadius: '8px' }} onClick={() => navigate(`/user/${userid}/donation/${donation._id}/payment/type/details`)} variant='p'>PayNow</Typography>
                       }
                     </TableCell>
                     <TableCell>
                       {new Date(donation.updatedAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
-                    {new Date(donation.updatedAt).toLocaleTimeString()}
+                      {new Date(donation.updatedAt).toLocaleTimeString()}
                     </TableCell>
                   </TableRow>
                 ))}

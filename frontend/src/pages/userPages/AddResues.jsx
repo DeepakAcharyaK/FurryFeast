@@ -25,7 +25,7 @@ const AddRescues = ({ userid }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('image:',image)
+    console.log('image:', image);
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("rescuetitle", formData.rescuetitle);
@@ -39,7 +39,6 @@ const AddRescues = ({ userid }) => {
         console.log(`${key}: ${value}`);
       });
 
-      
       const response = await axios.post(
         "http://localhost:3000/user/addrescue",
         formDataToSend,
@@ -51,12 +50,17 @@ const AddRescues = ({ userid }) => {
       if (response.status === 200) {
         toast.success("Rescue information has been successfully sent");
         console.log("Rescue details:", response.data.data);
+        
+        // Reset form fields
         setformData({
           rescuetitle: "",
           location: "",
           description: "",
         });
+
+        // Clear the image state and file input
         setImage(null);
+        document.querySelector('input[type="file"]').value = "";
       }
     } catch (error) {
       error.response?.status === 500 && toast.error(error.response.data.message);
@@ -168,3 +172,4 @@ const AddRescues = ({ userid }) => {
 };
 
 export default AddRescues;
+

@@ -666,66 +666,69 @@ const payment=async (req,res)=>{
   }
 }
 
-const generateInvoice=async (req, res)=>{
-    const { userid, donationid, amount, date, nameOnCard } = req.body;
-  
-    // Invoice Data
-    const invoiceData = {
-      sender: {
-        company: "Your Organization Name",
-        address: "123 Donation Street",
-        zip: "12345",
-        city: "Charity City",
-        country: "CharityLand",
-        custom1: "Thank you for your donation!",
+const generateInvoice = async (req, res) => {
+  const { userid, donationid, amount, date, nameOnCard } = req.body;
+
+  // Invoice Data
+  const invoiceData = {
+    sender: {
+      company: "FURRY FEASTS",
+      address: "Near City Centre Mall, Bejai Main Road, Donation Street",
+      zip: "574210",
+      email: "info@mangalorepethaven.com",
+      phone: "+91 98765 43210",
+      city: "Mangalore, Karnataka",
+      country: "India",
+      custom1: "Thank you for your donation!",
+    },
+    client: {
+      name: `User Name: ${nameOnCard}`,
+      id: userid,
+      custom1: `Donation ID: ${donationid}`,
+    },
+    information: {
+      date: date,
+      number: donationid,
+    },
+    products: [
+      {
+        description: "Donation",
+        price: amount,
       },
-      client: {
-        name: nameOnCard,
-        id: userid,
-        custom1: `Donation ID: ${donationid}`,
-      },
-      information: {
-        date: date,
-        number: donationid,
-      },
-      products: [
-        {
-          quantity: 1,
-          description: "Donation",
-          price: amount,
-        },
-      ],
-      bottomNotice: "This is a system-generated invoice. Thank you for your support!",
-    };
-  
-    try {
-      // Generate PDF
-      const invoice = await easyinvoice.createInvoice(invoiceData);
-      const fileName = `Invoice_${donationid}.pdf`;
-      const filePath = path.join(__dirname, fileName);
-  
-      // Save invoice as a PDF file
-      fs.writeFileSync(filePath, invoice.pdf, "base64");
-  
-      // Send the file as a response for download
-      res.download(filePath, fileName, (err) => {
-        if (err) {
-          console.error(err);
-          res.status(500).send("Error downloading the invoice");
-        } else {
-          // Optional: Delete the file after sending to save space
-          fs.unlinkSync(filePath);
-        }
-      });
-    } catch (error) {
-      console.error("Error generating invoice:", error);
-      res.status(500).send("Failed to generate invoice");
+    ],
+    bottomNotice: "This is a system-generated invoice. Thank you for your support!",
+  };
+
+  try {
+    const invoice = await easyinvoice.createInvoice(invoiceData);
+    const fileName = `Invoice_${donationid}.pdf`;
+    const filePath = path.join(__dirname, "../public/uploads/pdf", fileName);
+
+    // Ensure the directory exists
+    const dirPath = path.join(__dirname, "../public/uploads/pdf");
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
     }
-}
+
+    fs.writeFileSync(filePath, invoice.pdf, "base64");
+
+    res.download(filePath, fileName, (err) => {
+      if (err) {
+        console.error("Download error:", err);
+        res.status(500).send("Error downloading the invoice");
+      }
+    });
+
+  } catch (error) {
+    console.error("Error generating invoice:", error);
+    res.status(500).send("Failed to generate invoice");
+  }
+};
 
 const allWorks= async (req, res) => {
   try {
-    const rescues = await Rescue.find().populate("rescueinfoby"); 
+    const rescues = await Rescue.find().populate("rescueinfoby").populate("rescuedby"); 
+    console.log(rescues)
 
     res.json(rescues);
   } catch (error) {

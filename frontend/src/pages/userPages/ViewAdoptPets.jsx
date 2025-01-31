@@ -54,7 +54,7 @@ const ViewAdoptPets = ({ userid }) => {
             petsData.map((pet) => (
               <Grid item xs={12} sm={6} md={4} key={pet._id}>
                 <Card onClick={() => handleCardClick(pet._id)} sx={{ borderRadius: '25px', cursor: 'pointer', boxShadow: '0 8px 32px 0 rgba(113, 113, 114, 0.37)' }}>
-                  <CardMedia component="img" height="250" image={pet.image} />
+                  <CardMedia component="img" height="250" image={`http://localhost:3000${pet.image}`} />
                   <CardContent>
                     <Typography variant="h6" gutterBottom fontWeight={600}>
                       {pet.name}

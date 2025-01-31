@@ -100,7 +100,7 @@ const PetDetails = () => {
                 maxHeight: 350,
                 objectFit: "cover",
               }}
-              image={pet.image}
+              image={`http://localhost:3000${pet.image}`}
               alt={pet.name}
             />
           </Grid>

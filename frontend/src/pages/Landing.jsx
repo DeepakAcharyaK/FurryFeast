@@ -1,7 +1,7 @@
 import '../stylesheets/Landing.css';
 import '../App.css';
 import React, { useRef, useState, useEffect } from 'react';
-import {Box,Card,CardContent,Typography,Chip,Avatar,Grid} from "@mui/material";
+import { Box, Card, CardContent, Typography, Chip, Avatar, Grid } from "@mui/material";
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import gsap from 'gsap';
@@ -10,15 +10,15 @@ import Footer from '../components/Footer';
 
 
 function Landing({ mode }) {
-  const navigate=useNavigate();
-  const {userid}=useParams()
+  const navigate = useNavigate();
+  const { userid } = useParams()
   return (
     <div className="landing-container">
       <Navbar mode={mode} />
       <Maincontainer />
-      {/* <Works /> */}
-      <Gallery navigate={navigate} userid={userid}/>
-      <Veterinery navigate={navigate} userid={userid}/>
+      <Works />
+      <Gallery navigate={navigate} userid={userid} />
+      <Veterinery navigate={navigate} userid={userid} />
       <Footer />
     </div>
   );
@@ -38,67 +38,66 @@ function Maincontainer() {
 
   return (
     <div onMouseOver={handleMouseOver} className="page flex main-content image-props">
-      <img ref={img} src="/images/dog.jpeg" alt="dog" />
+      <div >
+          <img className="img-cont" ref={img} src="/images/dog.jpg" alt="dog" />
+      </div>
       <h1>
+        <video src="/images/dogvideo.mp4" autoPlay loop width={300}></video>
         <span className="orange">FurryFeast</span> <br />
-        <span style={{ color: 'white' }}>YOUR BRAND</span>
+        <span  className="white">YOUR BRAND</span>
       </h1>
       <p>
         Celebrating the Joy of <span className="bold"> Pets</span>
       </p>
-      <button className="plan-button">Pick Your Plan</button>
     </div>
   );
 }
 
-// function Works() {
-//   const [works, setWorks] = useState([]);
+function Works() {
+  const [works, setWorks] = useState([]);
 
-//   useEffect(() => {
-//     const fetchWorks = async () => {
-//       try {
-//         const response = await axios.get('http://localhost:3000//works?limit=3'); // Fetch 3 items from works collection
-//         setWorks(response.data);
-//       } catch (error) {
-//         console.error('Error fetching works:', error);
-//       }
-//     };
-//     fetchWorks();
-//   }, []);
+  useEffect(() => {
+    const fetchWorks = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/user/rescues?limit=3'); // Fetch 3 items from works collection
+        setWorks(response.data);
+      } catch (error) {
+        console.error('Error fetching works:', error);
+      }
+    };
+    fetchWorks();
+  }, []);
 
-//   return (
-//     <div id="works" className="main-container">
-//       <header className="header flex">
-//         <div className="logo">Companionship </div>
-//         <div className="icon">Care </div>
-//         <div className="menu">Joy</div>
-//       </header>
+  return (
+    <div id="works" className="main-container">
+      <header className="header flex">
+        <div className="logo">Companionship </div>
+        <div className="icon">Care </div>
+        <div className="menu">Joy</div>
+      </header>
 
-//       <div className="work-section">
-//         <h1 className="work-title">(WORKS)</h1>
-//         <div className="work-details">
-//           <span>(2000-2024)</span>
-//           <span>({works.length})</span>
-//           <a href="#view-all" className="view-all">
-//             View all
-//           </a>
-//         </div>
+      <div className="work-section">
+        <h1 className="work-title head">(Works)</h1>
+        <div className="work-details"style={{display:'flex',justifyContent:'center'}}>
+          <span>({works.length})</span>
+          <Typography sx={{ cursor: 'pointer',color:'blue',fontWeight:600 }} onClick={() => navigate(`/user/${userid}/view-gallery`)}>view all</Typography>
+        </div>
 
-//         <div className="work-grid">
-//           {works.map((work, index) => (
-//             <div className="work-card" key={index}>
-//               <img src={work.image} alt={work.title} />
-//               <h3>{work.title}</h3>
-//               <p>{work.description}</p>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
+        <div className="work-grid" style={{ display: 'flex' }}>
+          {works.map((work, index) => (
+            <div className="work-card" key={index}>
+              <img src={`http://localhost:3000${work.image}`} alt={work.title} />
+              <h3>{work.title}</h3>
+              <p>{work.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
-function Gallery({navigate,userid}) {
+function Gallery({ navigate, userid }) {
 
   const [gallery, setGallery] = useState([]);
 
@@ -130,10 +129,9 @@ function Gallery({navigate,userid}) {
   return (
     <div className="page flex" id="gallery">
       <h1 className="work-title head">(Gallery)</h1>
-      <div className="work-details">
-
-       <Typography sx={{cursor:'pointer'}} onClick={()=>navigate(`/user/${userid}/view-gallery`)}>view all</Typography>
-
+      <div className="work-details" style={{display:'flex',justifyContent:'center'}}>
+        <span>({gallery.length})</span>
+        <Typography sx={{ cursor: 'pointer',color:'blue',fontWeight:600 }} onClick={() => navigate(`/user/${userid}/view-gallery`)}>view all</Typography>
       </div>
       <div
         className="land-gallery flex"
@@ -162,13 +160,13 @@ function Gallery({navigate,userid}) {
         }, 600)}
         style={{ position: 'relative', overflow: 'hidden' }}
       >
-        <h1 className='stroke'> <span style={{fontSize:'3em'}}>Are you want to see the gallery?</span>  <br />then <br />move the mouse here...</h1>
+        <h1 className='stroke'> <span style={{ fontSize: '3em' }}>Are you want to see the gallery?</span>  <br />then <br />move the mouse here...</h1>
       </div>
     </div>
   );
 }
 
-function Veterinery({navigate,userid}) {
+function Veterinery({ navigate, userid }) {
   const [veterinery, setVeterinery] = useState([]);
 
   useEffect(() => {
@@ -186,18 +184,19 @@ function Veterinery({navigate,userid}) {
   }, []);
 
   return (
-    <div className="page flex" style={{backgroundColor:''}} id="gallery">
+    <div className="page flex" style={{ backgroundColor: '' }} id="gallery">
       <h1 className="work-title head">(Veterinery)</h1>
-      <div className="work-details">
-        <Typography sx={{cursor:'pointer'}} onClick={()=>navigate(`/user/${userid}/view-veterinary`)}>view all</Typography>
+      <div className="work-details"style={{display:'flex',justifyContent:'center'}}>
+          <span>({veterinery.length})</span>
+          <Typography sx={{ cursor: 'pointer',color:'blue',fontWeight:600 }}  onClick={() => navigate(`/user/${userid}/view-veterinary`)}>view all</Typography>
       </div>
-      
+
       <Grid container direction="column" spacing={3} sx={{
-        display:'flex',
-        alignItems:'center',
-        justifyContent:'center',
-        flexDirection:'row',
-        padding:'16px'
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        padding: '16px'
       }}>
         {veterinery.map((vet, index) => (
           <Grid item key={index}>
