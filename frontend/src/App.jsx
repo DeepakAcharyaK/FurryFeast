@@ -20,11 +20,18 @@ import Profile from './pages/userPages/Profile';
 import DonationsMade from './pages/userPages/DonationsMade';
 import AdoptedPets from './pages/userPages/AdoptedPets';
 import RescuedPets from './pages/userPages/RescuedPets';
+import Payment from './pages/userPages/Payment';
+import AllRescueInfo from './pages/userPages/AllRescueInfo'
 
 //admin
 import ManageDonation from './pages/adminPages/ManageDonation'
-import Payment from './pages/userPages/Payment';
-import AllRescueInfo from './pages/userPages/AllRescueInfo';
+import Dashboards from './pages/adminPages/Dashboards';
+import ManageGallery from './pages/adminPages/ManageGallery';
+import ManageRescue from './pages/adminPages/ManageRescue';
+import ManagePetDog from './pages/adminPages/ManagePetDog';
+import ManageVeterinary from './pages/adminPages/ManageVeterinary';
+import ManageVaccination from './pages/adminPages/ManageVaccination';
+import Setting from './pages/adminPages/Setting';
 
 
 function App() {
@@ -87,6 +94,20 @@ function App() {
         <Route path="/profile" element={<Profile />} />
 
         <Route path="*" element={<Navigate to="/" />} />
+
+
+
+
+
+        <Route path="/adminDashboard" element={<Dashboards/>} />
+        <Route path="/manageRescue" element={<ManageRescue/>} />
+
+        <Route path="/Donations" element={<ManageDonation/>} />
+        <Route path='/adminSetting' element={<Setting/>} />
+        <Route path="/adminGallery" element={<ManageGallery/>} />
+        <Route path="/managePetDog" element={<ManagePetDog/>} />
+        <Route path='/manageVeterinary' element={<ManageVeterinary/>} />
+        <Route path='/manageVaccination' element={<ManageVaccination/>} />
       </Routes>
     </BrowserRouter>
   );

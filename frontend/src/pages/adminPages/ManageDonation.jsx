@@ -1,33 +1,37 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { DataGrid, GridToolbar, } from "@mui/x-data-grid";
-import { IconButton, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, } from "@mui/material";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { IconButton, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const ManageDonation = () => {
 
+const ManageDonation = () => {
   const [donationData, setDonationData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedDonation, setSelectedDonation] = useState(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-
 
   const columns = [
     { field: "_id", headerName: "Donation ID", width: 120 },
     { field: "donorname", headerName: "Donor Name", width: 180 },
-    { field: "email", headerName: "Email", width: 200 },
     { field: "contact", headerName: "Contact", width: 150 },
-    { field: "donationdate", headerName: "Donation Date", width: 150 },
+    { field: "createdAt", headerName: "Date", width: 150 ,renderCell:(params)=>{
+      return new Date(params.row.createdAt).toLocaleDateString();
+    }},
+    { field: "createdAt", headerName: "Time", width: 150 ,renderCell:(params)=>{
+      return new Date(params.row.createdAt).toLocaleTimeString();
+    }},
     { field: "description", headerName: "Description", width: 200 },
-    { field: "paymentReference", headerName: "Payment Reference", width: 200 },
-    { field: "amount", headerName: "Amount", width: 200 },
-    { field: "status", headerName: "Status", width: 250 },
+    { field: "amount", headerName: "Amount", width: 150 },
+    { field: "status", headerName: "Status", width: 150 },
     {
       field: "actions",
       headerName: "Actions",
-      width: 180,
+      width: 250,
       renderCell: (params) => (
         <>
-          <Button
+          {/* <Button
             variant="contained"
             color="success"
             onClick={() => updateStatus(params.row._id, "Accepted")}
@@ -41,7 +45,7 @@ const ManageDonation = () => {
             onClick={() => updateStatus(params.row._id, "Rejected")}
           >
             Reject
-          </Button>
+          </Button> */}
           <IconButton onClick={() => handleDelete(params.row._id)}>
             <DeleteIcon />
           </IconButton>
@@ -53,12 +57,8 @@ const ManageDonation = () => {
   const fetchDonationData = async () => {
     try {
       const response = await axios.get("http://localhost:3000/admin/donations");
-      setDonationData(
-        response.data.donations.map((donation) => ({
-          ...donation,
-          email: donation.email
-        }))
-      );
+      setDonationData(response.data.donations);
+      setFilteredData(response.data.donations);
     } catch (error) {
       console.error("Error fetching donation data:", error);
     }
@@ -69,16 +69,19 @@ const ManageDonation = () => {
   }, []);
 
   useEffect(() => {
-    console.log(donationData);
-  }, [donationData]);
+    setFilteredData(
+      donationData.filter((donation) =>
+        donation.donorname.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
+  }, [searchQuery, donationData]);
 
   const updateStatus = async (donationId, newStatus) => {
     try {
       const response = await axios.patch(`http://localhost:3000/admin/donations/update-status/${donationId}`, {
-        status: newStatus
+        status: newStatus,
       });
-      if (response.status == 200)
-        fetchDonationData();
+      if (response.status === 200) fetchDonationData();
     } catch (error) {
       console.error(`Error updating status for donation ID ${donationId}:`, error);
     }
@@ -87,15 +90,14 @@ const ManageDonation = () => {
   const handleDelete = (donation) => {
     setSelectedDonation(donation);
     setOpenDeleteDialog(true);
-    console.log(selectedDonation)
   };
 
   const confirmDelete = async () => {
     try {
       const response = await axios.delete(`http://localhost:3000/admin/donations/delete/${selectedDonation}`);
-      setOpenDeleteDialog(false)
+      setOpenDeleteDialog(false);
       setSelectedDonation(null);
-      if (response == 200) {
+      if (response.status === 200) {
         fetchDonationData();
       }
     } catch (error) {
@@ -103,37 +105,34 @@ const ManageDonation = () => {
     }
   };
 
-
-
   return (
     <div>
+      <TextField
+        label="Search by Donor Name"
+        variant="outlined"
+        margin="normal"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+
       <div style={{ height: 400, width: "100%", marginTop: "20px" }}>
         <DataGrid
-          rows={donationData}
+          rows={filteredData}
           columns={columns}
           pageSize={5}
           rowsPerPageOptions={[5]}
           getRowId={(row) => row._id}
-          components={{
-            Toolbar: GridToolbar,
-          }}
+          components={{ Toolbar: GridToolbar }}
         />
       </div>
 
-      {/* Dialog for Delete Confirmation */}
-      <Dialog
-        open={openDeleteDialog}
-        onClose={() => setOpenDeleteDialog(false)}
-      >
+      <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
-          Are you sure you want to delete {selectedDonation?.donorname}'s donation?
+          Are you sure you want to delete this donation?
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={() => setOpenDeleteDialog(false)}
-            color="secondary"
-          >
+          <Button onClick={() => setOpenDeleteDialog(false)} color="secondary">
             Cancel
           </Button>
           <Button onClick={confirmDelete} color="primary">
@@ -146,4 +145,3 @@ const ManageDonation = () => {
 };
 
 export default ManageDonation;
-

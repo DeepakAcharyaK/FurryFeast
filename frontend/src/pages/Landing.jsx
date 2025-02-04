@@ -42,8 +42,8 @@ function Maincontainer() {
           <img className="img-cont" ref={img} src="/images/dog.jpg" alt="dog" />
       </div>
       <h1>
-        <video src="/images/dogvideo.mp4" autoPlay loop width={300}></video>
-        <span className="orange">FurryFeast</span> <br />
+      <video src="/images/dogvideo.mp4" autoPlay loop muted width={300}></video>
+      <span className="orange">FurryFeast</span> <br />
         <span  className="white">YOUR BRAND</span>
       </h1>
       <p>

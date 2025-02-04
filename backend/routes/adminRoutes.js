@@ -2,6 +2,7 @@ const express=require('express');
 const router=express.Router()
 const adminController=require('../controllers/adminController');
 
+const upload = require('../middlewares/upload');
 
 router.post('/login',adminController.adminLogin)
 
@@ -11,20 +12,35 @@ router.patch('/donations/update-status/:donationId', adminController.updateStatu
 
 router.delete('/donations/delete/:donationId', adminController.deleteDonation);
 
-// router.post('/manage-donation', adminController.ManageDonation);
+router.get('/rescues', adminController.manageRescues);
 
-// router.post('/manage-volunteer', adminController.ManageVolunteer);
+router.patch('/rescues/update-status/:rescueId', adminController.updateStatus1);
 
-// router.post('/manage-rescue', adminController.ManageRescue);
+router.delete('/rescues/delete/:rescueId', adminController.deleteRescue);
 
-// router.post('/manage-gallery', adminController.ManageGallery);
+router.get('/getadmindetails/:id',adminController.getAdminDetails)
 
-// router.post('/manage-pet-dog/:id', adminController.ManagePetDog);
+router.put("/updateadmindetails", upload.single("avatar"), adminController.updateAdminDetails);
 
-// router.post('/manage-pet-request/:id', adminController.ManagePetRequest);
+router.get('/Veterinaries', adminController.manageVeterinaries);
 
-// router.post('/manage-vaccination/:id', adminController.ManageVaccination);
+router.post('/Veterinaries/add', adminController.addVeterinaries);
 
-// router.post('/manage-veterinary/:id', adminController.ManageVeterinary);
+router.put('/veterinaries/edit/:id', adminController.editVeterinaries);
+
+router.delete('/veterinaries/delete/:id', adminController.deleteVeterinaries);
+
+router.get('/Vaccinations', adminController.manageVaccinations);
+
+router.post('/Vaccinations/add', adminController.addVaccinations);
+
+router.put('/vaccinations/edit/:id', adminController.editVaccinations);
+
+router.delete('/vaccinations/delete/:id', adminController.deleteVaccinations);
+
+router.get('/pets', adminController.managePetDog);
+
+router.post('/pets',upload.single('photo'),adminController.addPetDog);
+
 
 module.exports = router;

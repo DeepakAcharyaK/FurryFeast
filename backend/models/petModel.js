@@ -9,7 +9,7 @@ const petSchema = mongoose.Schema({
     },
     image: {
         type: String,
-        required: [true, "Please upload an image"]
+        default:'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg'
     },
     breed: {
         type: String,
@@ -26,10 +26,10 @@ const petSchema = mongoose.Schema({
         enum: ["Male", "Female", "Unknown"],
         default: "Unknown",
     },
-    vaccinated: {
+    vaccinationDets: [{
          type:mongoose.Schema.Types.ObjectId,
          ref:'Vaccination',
-    },
+    }],
     adoptionStatus: {
         type: String,
         enum: ["Available", "Adopted", "Pending"],
