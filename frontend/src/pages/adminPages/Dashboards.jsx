@@ -48,7 +48,7 @@ const Dashboards = () => {
              { text: "Manage Gallery", icon: <PhotoLibraryIcon />, path: "/adminGallery" },
              { text: "Manage Donation", icon: <AttachMoneyIcon />, path: "/Donations" },
              { text: "Manage Pet Dog", icon: <PetsIcon />, path: "/managePetDog" },
-             { text: "Manage Pet Request", icon: <PetsIcon />, path: "/manage-pet-request" },
+             { text: "Manage Pet Request", icon: <PetsIcon />, path: "/managePetRequest" },
              { text: "Manage Vaccination", icon: <VaccinesIcon />, path: "/manageVaccination" },
              { text: "Manage Veterinary", icon: <VaccinesIcon />, path: "/manageVeterinary" },
              { text: "Settings", icon: <SettingsIcon />, path: "/adminSetting" },

@@ -17,47 +17,41 @@ const ManageRescue = () => {
     { field: 'rescuetitle', headerName: 'Rescue Title', width: 180,},
     {
       field: 'rescueinfoby',
-      headerName: 'Rescue Informed By',
-      width: 180,
-      renderCell: (params) =>(params.row.rescueinfoby.username), // Accessing the `name` property
-    },
-    {
-      field: 'rescuedby',
       headerName: 'Rescued By',
       width: 180,
-      renderCell: (params) =>(params.row.rescuedby?.username || '-'), // Accessing the `name` property
+      renderCell: (params) =>params.row.username, // Accessing the `name` property
     },
     { field: 'createdAt', headerName: 'Rescue Date', width: 150,},
     { field: 'location', headerName: 'Location', width: 180},
     { field: 'description', headerName: 'Description', width: 250,},
     { field: 'status', headerName: 'Status', width: 250,},
-    // {
-    //   field: "actions",
-    //   headerName: "Actions",
-    //   width: 250,
-    //   renderCell: (params) => (
-    //     <>
-    //       <Button
-    //         variant="contained"
-    //         color="success"
-    //         onClick={() => updateStatus1(params.row._id, "Accepted")}
-    //         style={{ marginRight: "10px" }}
-    //       >
-    //         Accept
-    //       </Button>
-    //       <Button
-    //         variant="contained"
-    //         color="error"
-    //         onClick={() => updateStatus1(params.row._id, "Rejected")}
-    //       >
-    //         Reject
-    //       </Button>
-    //       <IconButton onClick={() => handleDelete(params.row._id)}>
-    //         <DeleteIcon />
-    //       </IconButton>
-    //     </>
-    //   ),
-    // },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 250,
+      renderCell: (params) => (
+        <>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={() => updateStatus1(params.row._id, "Accepted")}
+            style={{ marginRight: "10px" }}
+          >
+            Accept
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => updateStatus1(params.row._id, "Rejected")}
+          >
+            Reject
+          </Button>
+          <IconButton onClick={() => handleDelete(params.row._id)} color="error">
+            <DeleteIcon />
+          </IconButton>
+        </>
+      ),
+    },
   ];
   
   

@@ -4,7 +4,6 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { IconButton, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-
 const ManageDonation = () => {
   const [donationData, setDonationData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -16,13 +15,9 @@ const ManageDonation = () => {
     { field: "_id", headerName: "Donation ID", width: 120 },
     { field: "donorname", headerName: "Donor Name", width: 180 },
     { field: "contact", headerName: "Contact", width: 150 },
-    { field: "createdAt", headerName: "Date", width: 150 ,renderCell:(params)=>{
-      return new Date(params.row.createdAt).toLocaleDateString();
-    }},
-    { field: "createdAt", headerName: "Time", width: 150 ,renderCell:(params)=>{
-      return new Date(params.row.createdAt).toLocaleTimeString();
-    }},
+    { field: "donationdate", headerName: "Donation Date", width: 150 },
     { field: "description", headerName: "Description", width: 200 },
+    { field: "paymentReference", headerName: "Payment Reference", width: 150 },
     { field: "amount", headerName: "Amount", width: 150 },
     { field: "status", headerName: "Status", width: 150 },
     {
@@ -31,22 +26,7 @@ const ManageDonation = () => {
       width: 250,
       renderCell: (params) => (
         <>
-          {/* <Button
-            variant="contained"
-            color="success"
-            onClick={() => updateStatus(params.row._id, "Accepted")}
-            style={{ marginRight: "10px" }}
-          >
-            Accept
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => updateStatus(params.row._id, "Rejected")}
-          >
-            Reject
-          </Button> */}
-          <IconButton onClick={() => handleDelete(params.row._id)}>
+          <IconButton onClick={() => handleDelete(params.row._id)} color="error">
             <DeleteIcon />
           </IconButton>
         </>

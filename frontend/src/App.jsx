@@ -25,6 +25,7 @@ import AllRescueInfo from './pages/userPages/AllRescueInfo'
 
 //admin
 import ManageDonation from './pages/adminPages/ManageDonation'
+import AdminHeader from './components/AdminHeader'
 import Dashboards from './pages/adminPages/Dashboards';
 import ManageGallery from './pages/adminPages/ManageGallery';
 import ManageRescue from './pages/adminPages/ManageRescue';
@@ -65,49 +66,42 @@ function App() {
 
             {role !== 'admin' && (
               <>
-                <Route path="/user/:userid/make-a-donation" element={<AddDonations userid={userid}/>} />
-                <Route path="/user/:userid/donation/:donationid/payment/type/details" element={<Payment userid={userid}/>} />
+                <Route path="/user/:userid/make-a-donation" element={<AddDonations userid={userid} />} />
+                <Route path="/user/:userid/donation/:donationid/payment/type/details" element={<Payment userid={userid} />} />
                 <Route path="/user/:userid/view-gallery" element={<ViewGallery />} />
                 <Route path="/user/:userid/view-available-works" element={<ViewWorks userid={userid} />} />
                 <Route path="/user/:userid/pets/rescue" element={<AddResues userid={userid} />} />
-                <Route path="/user/:userid/adopt/pets" element={<ViewAdoptPets userid={userid}/>} />
+                <Route path="/user/:userid/adopt/pets" element={<ViewAdoptPets userid={userid} />} />
                 <Route path="/user/:userid/view-veterinary" element={<ViewVeterinary />} />
-                <Route path="/user/:userid/adopt/pets/petdetails/:id" element={<PetDetails userid={userid}/>} />
+                <Route path="/user/:userid/adopt/pets/petdetails/:id" element={<PetDetails userid={userid} />} />
                 <Route path="/user/:userid/profile/settings" element={<Settings />} />
                 <Route path="/user/:userid/all/donations/made-by/:userid" element={<DonationsMade userid={userid} />} />
                 <Route path="/user/:userid/all/rescued/pets-by/:userid" element={<RescuedPets userid={userid} />} />
                 <Route path="/user/:userid/all/rescue/information/given-by/:userid" element={<AllRescueInfo userid={userid} />} />
-                <Route path="/user/:userid/all/adopted/pets-by/:userid" element={<AdoptedPets userid={userid} />} /> 
+                <Route path="/user/:userid/all/adopted/pets-by/:userid" element={<AdoptedPets userid={userid} />} />
 
               </>
             )}
 
             {
-              role==='admin' &&(
+              role === 'admin' && (
                 <>
-                  <Route path="/adminDashboard" element={<ManageDonation/>} />
-                </>
+                  <Route path="/adminDashboard" element={<Dashboards />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/Donations" element={<ManageDonation />} />
+                  <Route path='/adminSetting' element={<Setting />} />
+                  <Route path="/adminGallery" element={<ManageGallery />} />
+                  <Route path="/manageRescue" element={<ManageRescue />} />
+                  <Route path="/managePetDog" element={<ManagePetDog />} />
+                  <Route path='/manageVeterinary' element={<ManageVeterinary />} />
+                  <Route path='/manageVaccination' element={<ManageVaccination />} />                </>
               )
             }
           </Route>
         )}
-        <Route path="/profile" element={<Profile />} />
 
         <Route path="*" element={<Navigate to="/" />} />
 
-
-
-
-
-        <Route path="/adminDashboard" element={<Dashboards/>} />
-        <Route path="/manageRescue" element={<ManageRescue/>} />
-
-        <Route path="/Donations" element={<ManageDonation/>} />
-        <Route path='/adminSetting' element={<Setting/>} />
-        <Route path="/adminGallery" element={<ManageGallery/>} />
-        <Route path="/managePetDog" element={<ManagePetDog/>} />
-        <Route path='/manageVeterinary' element={<ManageVeterinary/>} />
-        <Route path='/manageVaccination' element={<ManageVaccination/>} />
       </Routes>
     </BrowserRouter>
   );

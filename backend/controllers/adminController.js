@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const mongoose = require("mongoose"); 
 const Admin = require('../models/adminModel');
 const Donation = require('../models/donationModel');
 const Gallery = require('../models/galleryModel');
@@ -152,54 +153,63 @@ const manageVeterinaries = async (req, res) => {
 };
 
 // add vaccination
-
 const addVaccinations = async (req, res) => {
   try {
-    console.log(req.body)
-    // const { petName, vaccineName, vaccinationDate, nextDueDate, vaccinationNotes}=req.body
-    // const newVaccination = await Vaccination.create({
-    //   petName, vaccineName, vaccinationDate, nextDueDate, vaccinationNotes
-    // })
-    // res.status(201).json({ message: "Vaccination added successfully",newVaccination });
+    console.log("🔍 Received data from frontend:", req.body);  // ✅ Debug log
+
+    const { petId,petName, vaccineName, vaccinationDate, nextDueDate, vaccinationNotes } = req.body;
+
+    if (!petName || !vaccineName) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const newVaccination = await Vaccination.create({
+      petId,petName, vaccineName, vaccinationDate, nextDueDate, vaccinationNotes
+    });
+
+    res.status(201).json({ message: "Vaccination added successfully", newVaccination });
+
   } catch (error) {
     console.error("Error saving vaccination:", error);
-    res.status(500).json({ error: error.message });  // Return detailed error
+    res.status(500).json({ error: error.message });
   }
 };
 
-const editVaccinations = async (req, res) => {
-  try {
-    const {id}=req.params;
-    const {  petName, vaccineName, vaccinationDate, nextDueDate, vaccinationNotes}=req.body.formValues
-    const newVaccination = await Vaccination.findByIdAndUpdate(id,{
-       petName, vaccineName, vaccinationDate, nextDueDate, vaccinationNotes
-    },{
-      new:true
-    })
-    res.status(201).json({ message: "Vaccination updated successfully",newVaccination });
-  } catch (error) {
-    console.error("Error updating vaccination:", error);
-    res.status(500).json({ error: error.message });  // Return detailed error
-  }
-};
 
-const deleteVaccinations = async (req, res) => {
-  try {
-    const {id}=req.params;
-    const newVaccination = await Vaccination.findByIdAndDelete(id,{
-      new:true
-    })
-    res.status(201).json({ message: "Vaccination deleted successfully",newVaccination });
-  } catch (error) {
-    console.error("Error delete vaccination:", error);
-    res.status(500).json({ error: error.message });  // Return detailed error
-  }
-};
+
+// const editVaccinations = async (req, res) => {
+//   try {
+//     const {id}=req.params;
+//     const {  petName, vaccineName, vaccinationDate, nextDueDate, vaccinationNotes}=req.body.formValues
+//     const newVaccination = await Vaccination.findByIdAndUpdate(id,{
+//        petName, vaccineName, vaccinationDate, nextDueDate, vaccinationNotes
+//     },{
+//       new:true
+//     })
+//     res.status(201).json({ message: "Vaccination updated successfully",newVaccination });
+//   } catch (error) {
+//     console.error("Error updating vaccination:", error);
+//     res.status(500).json({ error: error.message });  // Return detailed error
+//   }
+// };
+
+// const deleteVaccinations = async (req, res) => {
+//   try {
+//     const {id}=req.params;
+//     const newVaccination = await Vaccination.findByIdAndDelete(id,{
+//       new:true
+//     })
+//     res.status(201).json({ message: "Vaccination deleted successfully",newVaccination });
+//   } catch (error) {
+//     console.error("Error delete vaccination:", error);
+//     res.status(500).json({ error: error.message });  // Return detailed error
+//   }
+// };
 
 const manageVaccinations = async (req, res) => {
   try {
-      const vaccionations = await Vaccination.find();
-      res.status(200).json({ message: 'Vaccination  fetched successfully', vaccionations });
+      const vaccinations = await Vaccination.find();
+      res.status(200).json({ message: 'Vaccination  fetched successfully', vaccinations });
   } catch (error) {
       console.error('Error fetching vaccination:', error);
       res.status(500).json({ message: 'Failed to fetch vaccination' });
@@ -337,149 +347,112 @@ const addPetDog = async (req, res) => {
 
 
   // Edit pet details
-const editPetDog = async (req, res) => {
-  try {
-      const { petId } = req.params; 
-      const updatedData = req.body; 
-
-      // If a new image file is uploaded, update the image in updatedData
-      if (req.file) {
-          updatedData.image = req.file.filename; // Save the image file name
+  const editPetDog = async (req, res) => {
+    try {
+      const { petId } = req.params;
+      let updatedData = {};
+  
+      // Extract only the fields that are provided in the request
+      if (req.body.name) updatedData.name = req.body.name;
+      if (req.body.breed) updatedData.breed = req.body.breed;
+      if (req.body.age) updatedData.age = req.body.age;
+      if (req.file) updatedData.image = req.file.filename; // Update only if a new image is uploaded
+  
+      // Check if there's any data to update
+      if (Object.keys(updatedData).length === 0) {
+        return res.status(400).json({ message: "No valid fields provided for update" });
       }
-
-      // Find the pet by ID and update the details
-      const updatedPet = await Pet.findByIdAndUpdate(petId, updatedData, { new: true });
-      
-      // If pet not found, return 404
+  
+      // Find and update the pet
+      const updatedPet = await Pet.findByIdAndUpdate(petId, { $set: updatedData }, { new: true, runValidators: true });
+  
       if (!updatedPet) {
-          return res.status(404).json({ message: "Pet not found" });
+        return res.status(404).json({ message: "Pet not found" });
       }
-
-      // Respond with the updated pet data
+  
       res.status(200).json({
-          message: "Pet details updated successfully",
-          pet: updatedPet,
+        message: "Pet details updated successfully",
+        pet: updatedPet,
       });
-  } catch (error) {
+    } catch (error) {
       console.error("Error updating pet:", error);
-      res.status(500).json({
-          message: "Error updating pet details",
-          error: error.message,
-      });
-  }
-};
+      res.status(500).json({ message: "Error updating pet details", error: error.message });
+    }
+  };
+  
+  
 
 // Delete a pet dog
 const deletePetDog = async (req, res) => {
   try {
-  const { petId } = req.params;
-  const deletePetDog = await PetDog.findByIdAndDelete(petId);
-  
-  if (!deletePetDog) {
-      return res.status(404).json({ message: "Pet not found" });
-  }
+    const { petId } = req.params;
+    console.log("Received Pet ID:", petId); // Debugging
 
-  res.status(200).json({ message: "Pet deleted successfully" });
+    // Ensure petId is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(petId)) {
+      return res.status(400).json({ error: "Invalid pet ID format" });
+    }
+
+    const deletedPet = await Pet.findByIdAndDelete(petId);
+
+    if (!deletedPet) {
+      return res.status(404).json({ error: "Pet not found" });
+    }
+
+    res.status(200).json({ message: "Pet deleted successfully", deletedPet });
   } catch (error) {
-  res.status(500).json({ message: "Error deleting pet", error });
+    console.error("Error deleting pet:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 // Update pet adoption status
-const updatePetStatus = async (req, res) => {
-  try {
-  const { petId } = req.params;
-  const { status } = req.body;
+// const updatePetStatus = async (req, res) => {
+//   try {
+//   const { petId } = req.params;
+//   const { status } = req.body;
   
-  const updatedPet = await PetDog.findByIdAndUpdate(petId, { adoptionStatus: status }, { new: true });
-  if (!updatedPet) {
-  return res.status(404).json({ message: "Pet not found" });
-  }
+//   const updatedPet = await Pet.findByIdAndUpdate(petId, { adoptionStatus: status }, { new: true });
+//   if (!updatedPet) {
+//   return res.status(404).json({ message: "Pet not found" });
+//   }
 
-  res.status(200).json({ message: "Pet status updated successfully", pet: updatedPet });
+//   res.status(200).json({ message: "Pet status updated successfully", pet: updatedPet });
+//   } catch (error) {
+//   res.status(500).json({ message: "Error updating pet status", error });
+//   }
+// };
+
+// Manage pet Request
+const managePetRequest = async (req, res) => {
+  try {
+      const petrequests = await PetRequest.find().populate('userId');
+      res.status(200).json({ message: 'Requested dog fetched successfully', petrequests });
   } catch (error) {
-  res.status(500).json({ message: "Error updating pet status", error });
+      console.error('Error fetching requested dog:', error);
+      res.status(500).json({ message: 'Failed to fetch requested dog' });
   }
 };
 
-// Add a new image
-// const addImage = async (req, res) => {
-//   try {
-//     const { description } = req.body;
-//     const image = req.file.path;
+const updateRequestStatus=async(req,res)=>{
+const {petId}=req.params;
+const {status}=req.body;
+const updatedRequest=await PetRequest.findByIdAndUpdate(petId,{status:status},{new:true})
+res.status(200).json({
+  updatedRequest
+})
+}
 
-//     if (!image) {
-//       return res.status(400).json({ message: "Please upload an image." });
-//     }
+const deletePetRequest=async(req,res)=>{
+const {petId}=req.params;
+const deletedRequest=await PetRequest.findByIdAndDelete(petId)
+res.status(200).json({
+  deletedRequest
+})
+}
 
-//     const newImage = new Gallery({
-//       image: `/uploads/${image.filename}`, // Save the image path in the database
-//       description,
-//     });
 
-//     await newImage.save();
-//     res.status(201).json({ message: "Image added successfully.", gallery: newImage });
-//   } catch (error) {
-//     console.error("Error adding image:", error);
-//     res.status(500).json({ message: "Failed to add image", error: error.message });
-//   }
-// };
-
-// // Delete an image
-// const deleteImage = async (req, res) => {
-//   try {
-//     const { imageId } = req.params;
-//     const imageToDelete = await Gallery.findById(imageId);
-
-//     if (!imageToDelete) {
-//       return res.status(404).json({ message: "Image not found." });
-//     }
-
-//     // Delete the image file from the server (if required)
-//     const imagePath = path.join(__dirname, "../uploads", imageToDelete.image.split("/")[2]);
-//     fs.unlinkSync(imagePath);
-
-//     await Gallery.findByIdAndDelete(imageId);
-//     res.status(200).json({ message: "Image deleted successfully." });
-//   } catch (error) {
-//     console.error("Error deleting image:", error);
-//     res.status(500).json({ message: "Failed to delete image", error: error.message });
-//   }
-// };
-
-// // Update image details (description)
-// const updateImage = async (req, res) => {
-//   try {
-//     const { imageId } = req.params;
-//     const { description } = req.body;
-
-//     const updatedImage = await Gallery.findByIdAndUpdate(
-//       imageId,
-//       { description },
-//       { new: true }
-//     );
-
-//     if (!updatedImage) {
-//       return res.status(404).json({ message: "Image not found." });
-//     }
-
-//     res.status(200).json({ message: "Image updated successfully.", gallery: updatedImage });
-// } catch (error) {
-//     console.error("Error updating image:", error);
-//     res.status(500).json({ message: "Failed to update image", error: error.message });
-// }
-// };
-
-// // Get all images
-// const getGallery = async (req, res) => {
-// try {
-//     const gallery = await Gallery.find();
-//     res.status(200).json({ gallery });
-// } catch (error) {
-//     console.error("Error fetching gallery data:", error);
-//     res.status(500).json({ message: "Failed to fetch gallery data", error: error.message });
-// }
-// };
 
 module.exports = {
     adminLogin,
@@ -493,9 +466,6 @@ module.exports = {
     editVeterinaries,
     deleteVeterinaries,
     manageVeterinaries,
-    addVaccinations,
-    editVaccinations,
-    deleteVaccinations,
     manageVaccinations,
     getAdminDetails,
     updateAdminDetails,
@@ -503,11 +473,14 @@ module.exports = {
     // deleteImage,
     // updateImage,
     // getGallery,
-    updatePetStatus,
     deletePetDog,
     editPetDog,
     addPetDog,
     managePetDog,
+    deletePetRequest,
+    updateRequestStatus,
+    managePetRequest,
+    addVaccinations,
     // manageGallery,    // managePets,
     // manageVeterinarians,
 };

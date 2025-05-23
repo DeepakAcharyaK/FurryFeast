@@ -33,38 +33,7 @@ const ManageVaccination = () => {
     { field: "vaccinationDate", headerName: "Vaccination Date", width: 150 },
     { field: "nextDueDate", headerName: "Next Due-Date", width: 200 },
     { field: "vaccinationNotes", headerName: "Vaccination Notes", width: 150 },
-    { field: "status", headerName: "Status", width: 250 },
-    {
-      field: "actions",
-      headerName: "Actions",
-      width: 150,
-      renderCell: (params) => (
-        <>
-        <Button
-          variant="contained"
-          color="success"
-          onClick={() => updateStatus(params.row._id, "Pending")}
-          style={{ marginRight: "10px" }}
-        >
-          Pending
-        </Button>
-        <Button
-          variant="contained"
-          color="success"
-          onClick={() => updateStatus(params.row._id, "OverDue")}
-          style={{ marginRight: "10px" }}
-        >
-          OverDue
-        </Button>
-          <IconButton onClick={() => handleEdit(params.row)}>
-            <EditIcon />
-          </IconButton>
-          <IconButton onClick={() => handleDelete(params.row)}>
-            <DeleteIcon />
-          </IconButton>
-        </>
-      ),
-    },
+
   ];
 
   const fetchVaccinationData = async () => {
@@ -152,15 +121,6 @@ const ManageVaccination = () => {
 
   return (
     <div>
-      <Button
-        variant="contained"
-        color="primary"
-        startIcon={<AddIcon />}
-        onClick={handleAdd}
-        style={{ marginBottom: "20px" }}
-      >
-        Add Vaccination
-      </Button>
        <div>
           <TextField
             label="Search Veterinary"

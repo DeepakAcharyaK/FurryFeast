@@ -178,12 +178,14 @@ const Setting = () => {
               value={formData.email}
               onChange={handleInputChange}
               variant="outlined"
+              disabled
             />
            
             <TextField
               fullWidth
               name="password"
               label="Password"
+              type="password"
               value={formData.password}
               onChange={handleInputChange}
               variant="outlined"

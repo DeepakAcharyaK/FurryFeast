@@ -30,17 +30,28 @@ router.put('/veterinaries/edit/:id', adminController.editVeterinaries);
 
 router.delete('/veterinaries/delete/:id', adminController.deleteVeterinaries);
 
-router.get('/Vaccinations', adminController.manageVaccinations);
+router.get('/vaccinations', adminController.manageVaccinations);
 
-router.post('/Vaccinations/add', adminController.addVaccinations);
+router.post('/vaccinations/add', adminController.addVaccinations);
 
-router.put('/vaccinations/edit/:id', adminController.editVaccinations);
+// router.put('/vaccinations/edit/:id', adminController.editVaccinations);
 
-router.delete('/vaccinations/delete/:id', adminController.deleteVaccinations);
+// router.delete('/vaccinations/delete/:id', adminController.deleteVaccinations);
 
 router.get('/pets', adminController.managePetDog);
 
 router.post('/pets',upload.single('photo'),adminController.addPetDog);
+
+router.delete('/pets/delete/:petId', adminController.deletePetDog);
+
+router.put('/pets/edit/:petId',adminController.editPetDog);
+
+router.get('/petrequests', adminController.managePetRequest);
+
+router.patch('/petrequests/update-status/:petId', adminController.updateRequestStatus);
+
+router.delete('/petrequests/delete/:petId', adminController.deletePetRequest);
+
 
 
 module.exports = router;

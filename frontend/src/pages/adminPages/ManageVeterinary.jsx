@@ -51,10 +51,10 @@ const ManageVeterinary = () => {
       width: 150,
       renderCell: (params) => (
         <>
-          <IconButton onClick={() => handleEdit(params.row)}>
+          <IconButton onClick={() => handleEdit(params.row)} color="primary">
             <EditIcon />
           </IconButton>
-          <IconButton onClick={() => handleDelete(params.row)}>
+          <IconButton onClick={() => handleDelete(params.row)} color="error">
             <DeleteIcon />
           </IconButton>
         </>

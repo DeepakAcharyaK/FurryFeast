@@ -24,6 +24,8 @@ const ManagePetDog = () => {
     adoptionStatus: "",
   });
   const [vaccinationData, setVaccinationData] = useState({
+    petId: "",
+    petName:"",
     vaccineName: "",
     vaccinationDate: "",
     nextDueDate: "",
@@ -55,9 +57,26 @@ const ManagePetDog = () => {
   };
 
   const handleVaccinationEdit = (pet) => {
-    setFormData(pet);
+    if (!pet || !pet._id) {
+        console.error("Error: Pet data is missing or invalid", pet);
+        return;
+    }
+
+    setSelectedPetDog(pet); // Store full pet object
+
+    setVaccinationData({
+        petId: pet._id, // Ensure we set the correct pet ID
+        petName: pet.name, 
+        vaccineName: "",
+        vaccinationDate: "",
+        nextDueDate: "",
+        vaccinationNotes: "",
+        status: "Completed",
+    });
+
     setOpenVaccinationDialog(true);
-  };
+};
+
 
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -76,34 +95,114 @@ const ManagePetDog = () => {
   };
 
   const handleVaccinationSave = async () => {
-    try {
-      await axios.post("http://localhost:3000/admin/Vaccinations/add", vaccinationData); // Corrected vaccination route
-      setOpenVaccinationDialog(false);
-      fetchPetDogData();
-    } catch (error) {
-      console.error("Error saving vaccination details:", error);
+    if (!selectedPetDog) {
+        console.error("Error: No pet selected for vaccination.");
+        return;
     }
-  };
+
+    const vaccinationDataToSend = {
+        petId: selectedPetDog?._id || "",  // Ensure it's not undefined
+        petName: selectedPetDog?.name || "",
+        vaccineName: vaccinationData.vaccineName,
+        dateAdministered: vaccinationData.vaccinationDate,
+        nextDueDate: vaccinationData.nextDueDate,
+        vaccinationNotes: vaccinationData.vaccinationNotes,
+        status: vaccinationData.status,
+    };
+
+    console.log("Sending data:", vaccinationDataToSend); // Debugging output
+
+    if (!vaccinationDataToSend.petId || !vaccinationDataToSend.vaccineName || !vaccinationDataToSend.dateAdministered) {
+        console.error("Error: Missing required fields", vaccinationDataToSend);
+        return;
+    }
+
+    try {
+        const response = await fetch("http://localhost:3000/admin/vaccinations/add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(vaccinationDataToSend),
+        });
+
+        const result = await response.json();
+        console.log("Response:", result);
+
+        if (!response.ok) {
+            console.error("Error saving vaccination details:", result);
+        } else {
+            setOpenVaccinationDialog(false);
+            fetchPetDogData(); // Refresh the list
+        }
+    } catch (error) {
+        console.error("Error in handleVaccinationSave:", error);
+    }
+};
+
 
   const handlePetSave = async () => {
     try {
-      await axios.post("http://localhost:3000/admin/pets", formData); // Corrected pet save route
+      const response=await axios.post("http://localhost:3000/admin/pets", formData); // Corrected pet save route
       setOpenAddDialog(false);
-      fetchPetDogData();
+      setSelectedPetDog(null);
+      if(response.status===200){
+        fetchPetDogData();
+      }
     } catch (error) {
       console.error("Error saving pet details:", error);
     }
   };
 
-  const handlePetDelete = async () => {
+  const handlePetEdit = async () => {
     try {
-      await axios.delete(`http://localhost:3000/admin/pets/delete/${selectedPetDog}`); // Corrected pet delete route
+      const formData = new FormData();
+      if (editedPet.name) formData.append("name", editedPet.name);
+      if (editedPet.breed) formData.append("breed", editedPet.breed);
+      if (editedPet.age) formData.append("age", editedPet.age);
+      if (selectedFile) formData.append("image", selectedFile);
+  
+      const response = await axios.put(
+        `http://localhost:3000/admin/pets/edit/${selectedPetId}`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+  
+      if (response.status === 200) {
+        fetchPetDogData(); // Refresh data after update
+      }
+    } catch (error) {
+      console.error("Error updating pet:", error);
+    }
+  };
+  
+
+  const handlePetDelete = async () => {
+    if (!selectedPetDog) {
+      console.error("Error: No pet selected for deletion");
+      return;
+    }
+  
+    try {
+      console.log("Deleting Pet ID:", selectedPetDog); // Debugging
+  
+      const response = await axios.delete(
+        `http://localhost:3000/admin/pets/delete/${selectedPetDog}`
+      );
+  
+      if (response.status === 200) {
+        console.log("Pet deleted successfully");
+        fetchPetDogData();
+      } else {
+        console.error("Failed to delete pet. Status:", response.status);
+      }
+  
       setOpenDeleteDialog(false);
-      fetchPetDogData();
+      setSelectedPetDog(null);
     } catch (error) {
       console.error("Error deleting pet:", error);
     }
   };
+  
+  
 
   const columns = [
     {
@@ -266,6 +365,28 @@ const ManagePetDog = () => {
         <DialogTitle>Enter Vaccination Details</DialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField
+              label="Pet ID"
+              fullWidth
+              name="petId"
+              value={vaccinationData.petId}
+              InputProps={{
+                readOnly: true, // Prevents user from editing the pet name
+              }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Pet Name"
+              fullWidth
+              name="petName"
+              value={vaccinationData.petName}
+              InputProps={{
+                readOnly: true, // Prevents user from editing the pet name
+              }}
+            />
+          </Grid>
             <Grid item xs={12}>
               <TextField
                 label="Vaccine Name"
