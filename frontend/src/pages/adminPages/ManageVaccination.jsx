@@ -9,10 +9,15 @@ import {
   DialogTitle,
   Button,
   TextField,
+  Box,
+  Typography,
+  Stack,
+  Paper,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import AddIcon from "@mui/icons-material/Add";
+import Topbar from "../../components/adminComponents/Topbar";
+import Sidebar from "../../components/adminComponents/Sidebar";
 
 const ManageVaccination = () => {
   const [vaccinationData, setVaccinationData] = useState([]);
@@ -26,38 +31,64 @@ const ManageVaccination = () => {
     nextDueDate: "",
     vaccinationNotes: "",
   });
+  const [searchQuery, setSearchQuery] = useState("");
 
   const columns = [
-    { field: "petName", headerName: "Pet Name", width: 200 },
-    { field: "vaccineName", headerName: "Vaccine Name", width: 150 },
-    { field: "vaccinationDate", headerName: "Vaccination Date", width: 150 },
-    { field: "nextDueDate", headerName: "Next Due-Date", width: 200 },
-    { field: "vaccinationNotes", headerName: "Vaccination Notes", width: 150 },
-
+    { field: "petName", headerName: "Pet Name", flex: 1, minWidth: 150 },
+    { field: "vaccineName", headerName: "Vaccine Name", flex: 1, minWidth: 130 },
+    { field: "vaccinationDate", headerName: "Vaccination Date", flex: 1, minWidth: 130 },
+    { field: "nextDueDate", headerName: "Next Due-Date", flex: 1, minWidth: 150 },
+    { field: "vaccinationNotes", headerName: "Vaccination Notes", flex: 1, minWidth: 150 },
+    {
+      field: "actions",
+      headerName: "Actions",
+      minWidth: 120,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <Stack direction="row" spacing={1}>
+          <IconButton
+            color="primary"
+            onClick={() => handleEdit(params.row)}
+            aria-label="edit"
+            size="small"
+          >
+            <EditIcon />
+          </IconButton>
+          <IconButton
+            color="error"
+            onClick={() => handleDelete(params.row)}
+            aria-label="delete"
+            size="small"
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Stack>
+      ),
+    },
   ];
 
   const fetchVaccinationData = async () => {
     try {
       const response = await axios.get("http://localhost:3000/admin/vaccinations");
       setVaccinationData(response.data.vaccinations);
-      console.log(vaccinationData)
     } catch (error) {
       console.error("Error fetching vaccination data:", error);
     }
   };
- 
   useEffect(() => {
-     // Fetch vaccination data
     fetchVaccinationData();
   }, []);
 
-    useEffect(() => {
-      console.log(vaccinationData);
-    }, [vaccinationData]);
-
   const handleEdit = (vaccination) => {
     setSelectedVaccination(vaccination);
-    setFormValues(vaccination);
+    setFormValues({
+      petName: vaccination.petName || "",
+      vaccineName: vaccination.vaccineName || "",
+      vaccinationDate: vaccination.vaccinationDate || "",
+      nextDueDate: vaccination.nextDueDate || "",
+      vaccinationNotes: vaccination.vaccinationNotes || "",
+    });
     setOpenAddEditDialog(true);
   };
 
@@ -68,7 +99,9 @@ const ManageVaccination = () => {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/admin/vaccinations/delete/${selectedVaccination._id}`);
+      await axios.delete(
+        `http://localhost:3000/admin/vaccinations/delete/${selectedVaccination._id}`
+      );
       fetchVaccinationData();
       setOpenDeleteDialog(false);
     } catch (error) {
@@ -76,37 +109,14 @@ const ManageVaccination = () => {
     }
   };
 
-  const handleAdd = () => {
-    setFormValues({
-      petid:" ",
-      petName: "",
-      vaccineName: "",
-      vaccinationDate: "",
-      nextDueDate: "",
-      vaccinationNotes: "",
-    });
-    setSelectedVaccination(null);
-    setOpenAddEditDialog(true);
-  };
-
   const handleSave = async () => {
     try {
       if (selectedVaccination) {
-        // Update existing vaccination
-        const response=await axios.put(
-          `http://localhost:3000/admin/vaccinations/edit/${selectedVaccination._id}`,{
+        await axios.put(
+          `http://localhost:3000/admin/vaccinations/edit/${selectedVaccination._id}`,
           formValues
-        });
-        console.log(response)
-      } else {
-        // Add new vaccination
-        const response=await axios.post(
-        "http://localhost:3000/admin/vaccinations/add",
-        formValues
-      );
-        console.log(response)
+        );
       }
-
       fetchVaccinationData();
       setOpenAddEditDialog(false);
     } catch (error) {
@@ -119,49 +129,124 @@ const ManageVaccination = () => {
     setFormValues({ ...formValues, [name]: value });
   };
 
+  // Filter data based on search query
+  const filteredData = vaccinationData.filter((row) =>
+    Object.values(row)
+      .join(" ")
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
+  );
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev) => !prev);
+  };
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+
   return (
-    <div>
-       <div>
+    <Box sx={{ p: { xs: 1, md: 3 }, width:'100%', minHeight: "100vh" , mx: "auto",backgroundColor: "#f5f5f5",display:'flex',alignItems:'center',justifyContent:'center',mt:3}}> 
+      <Topbar toggleSidebar={toggleSidebar} />
+      <Sidebar isOpen={isSidebarOpen} />
+
+      <Paper  elevation={3} sx={{ p: 3,border:'none',boxShadow:'none',maxWidth: 1100,bgcolor: "#f4f6f8"}}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
+          <Typography variant="h5" fontWeight={600}>
+            Manage Vaccinations
+          </Typography>
+        </Stack>
+        <Box mb={2}>
           <TextField
-            label="Search Veterinary"
+            label="Search Vaccination"
             variant="outlined"
             size="small"
-            margin="normal"
+            width="20%"
+            value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-        </div>
-
-      <div style={{ height: 400, width: "100%" }}>
-        <DataGrid
-          rows={vaccinationData}
-          columns={columns}
-          pageSize={5}
-          getRowId={(row) => row._id}
-          components={{ Toolbar: GridToolbar }}
-        />
-      </div>
+        </Box>
+        <Box sx={{ height: 400, width: "100%" }}>
+          <DataGrid
+            rows={filteredData}
+            columns={columns}
+            pageSize={7}
+            getRowId={(row) => row._id}
+            components={{ Toolbar: GridToolbar }}
+            sx={{
+              borderRadius: 2,
+              backgroundColor: "#fafbfc",
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#f0f4f8",
+                fontWeight: "bold",
+              },
+            }}
+          />
+        </Box>
+      </Paper>
 
       {/* Add/Edit Dialog */}
-      <Dialog open={openAddEditDialog} onClose={() => setOpenAddEditDialog(false)}>
-        <DialogTitle>{selectedVaccination ? "Edit Vaccination" : "Add Vaccination"}</DialogTitle>
+      <Dialog
+        open={openAddEditDialog}
+        onClose={() => setOpenAddEditDialog(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          {selectedVaccination ? "Edit Vaccination" : "Add Vaccination"}
+        </DialogTitle>
         <DialogContent>
-          {Object.keys(formValues).map((key) => (
+          <Stack spacing={2} mt={1}>
             <TextField
-              key={key}
-              label={key.charAt(0).toUpperCase() + key.slice(1)}
-              name={key}
-              value={formValues[key]}
+              label="Pet Name"
+              name="petName"
+              disabled="true"
+              value={formValues.petName}
               onChange={handleInputChange}
               fullWidth
-              margin="normal"
+              required
             />
-          ))}
+            <TextField
+              label="Vaccine Name"
+              name="vaccineName"
+              value={formValues.vaccineName}
+              onChange={handleInputChange}
+              fullWidth
+              required
+            />
+            <TextField
+              label="Vaccination Date"
+              name="vaccinationDate"
+              type="date"
+              value={formValues.vaccinationDate}
+              onChange={handleInputChange}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField
+              label="Next Due Date"
+              name="nextDueDate"
+              type="date"
+              value={formValues.nextDueDate}
+              onChange={handleInputChange}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField
+              label="Vaccination Notes"
+              name="vaccinationNotes"
+              value={formValues.vaccinationNotes}
+              onChange={handleInputChange}
+              fullWidth
+              multiline
+              rows={2}
+            />
+          </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenAddEditDialog(false)} color="secondary">
+          <Button onClick={() => setOpenAddEditDialog(false)} color="secondary" variant="outlined">
             Cancel
           </Button>
-          <Button onClick={handleSave} color="primary">
+          <Button onClick={handleSave} color="primary" variant="contained">
             Save
           </Button>
         </DialogActions>
@@ -171,18 +256,19 @@ const ManageVaccination = () => {
       <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
-          Are you sure you want to delete {selectedVaccination?.name}?
+          Are you sure you want to delete vaccination for{" "}
+          <b>{selectedVaccination?.petName}</b>?
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDeleteDialog(false)} color="secondary">
+          <Button onClick={() => setOpenDeleteDialog(false)} color="secondary" variant="outlined">
             Cancel
           </Button>
-          <Button onClick={confirmDelete} color="primary">
+          <Button onClick={confirmDelete} color="error" variant="contained">
             Delete
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </Box>
   );
 };
 

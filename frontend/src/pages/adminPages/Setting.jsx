@@ -1,202 +1,211 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { Box, Typography, TextField, Avatar, Button, CircularProgress } from "@mui/material";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+
+import {
+  Box,
+  Typography,
+  Avatar,
+  TextField,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress,
+} from "@mui/material";
+import Sidebar from "../../components/adminComponents/Sidebar";
+import Topbar from "../../components/adminComponents/Topbar";
+
+const drawerWidth = 240;
 
 const Setting = () => {
-  const { adminid } = useParams();
-  const [loading, setLoading] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    profilePicture: "",
   });
+  const [openDialog, setOpenDialog] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const [profileImage, setProfileImage] = useState(null);
-  const [previewImage, setPreviewImage] = useState("");
-
+  // Fetch existing email and password from the database
   useEffect(() => {
-    const fetchAdminData = async () => {
+    const fetchSettings = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/admin/getadmindetails/67924f9af317a852e03a357e");
-
-        const {email, password, profilePicture } = response.data.data;
-
+        const response = await fetch("http://localhost:3000/admin/getadmindetails");
+        if (!response.ok) throw new Error("Failed to fetch settings");
+        const data = await response.json();
+        console.log(data.data);
         setFormData({
-          email,
-          password,
-          profilePicture: profilePicture || "/uploads/default-profile.jpg",
+          email: data.data.email || "",
+          password: data.data.password || "",
         });
-
-        setPreviewImage(profilePicture && `http://localhost:3000${profilePicture}`);
       } catch (error) {
-        console.error("Failed to fetch admin data:", error);
+        setFormData({
+          email: "",
+          password: "",
+        });
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAdminData();
-  }, [adminid]);
+    fetchSettings();
+  }, []);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev) => !prev);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleImageChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setProfileImage(file);
-
-      const reader = new FileReader();
-      reader.onload = () => setPreviewImage(reader.result);
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleDeletePicture = async () => {
-    setProfileImage(null);
-    setPreviewImage("http://localhost:3000/uploads/default-profile.jpg");
     setFormData((prev) => ({
       ...prev,
-      profilePicture: "/uploads/default-profile.jpg",
+      [name]: value,
     }));
   };
 
-  const handleFormSubmit = async (e) => {
+  const handleFormSubmit = (e) => {
     e.preventDefault();
-    const data = new FormData();
-    data.append("email", formData.email);
-    data.append("password", formData.password);
+    setOpenDialog(true);
+  };
 
-    if (profileImage) {
-      data.append("avatar", profileImage);
-    }
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+  };
 
+  const handleDialogConfirm = async () => {
+    setOpenDialog(false);
     try {
-      const response = await axios.put(
-        "http://localhost:3000/admin/updateadmindetails",
-        data,
-        {
-          headers: { id: userid, "Content-Type": "multipart/form-data" },
-        }
-      );
-      alert("Profile updated successfully!");
-      console.log("Updated admin profile info", response.data.data);
+      await fetch("http://localhost:3000/admin/updatedetails", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      console.log("Details updated successfully");
     } catch (error) {
-      console.error("Failed to update profile:", error);
-      alert("Failed to update profile.");
+      console.error("Failed to update details:", error);
     }
   };
 
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
   return (
-    <>
+    <Box sx={{ display: "flex" }}>
+      <Sidebar
+        isOpen={isSidebarOpen}
+        variant="persistent"
+        onClose={toggleSidebar}
+      />
       <Box
+        component="main"
         sx={{
-          minWidth: "100%",
-          minHeight: "100%",
+          flexGrow: 1,
+          p: 4,
+          marginLeft: `${drawerWidth}px`,
+          minHeight: "100vh",
+          background: "#f5f6fa",
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: 2,
+          flexDirection: "column",
         }}
       >
+        <Topbar
+          toggleSidebar={toggleSidebar}
+          admin={{ name: "Admin User", avatar: "/images/adminprofile.jpeg" }}
+        />
         <Box
           sx={{
-            width: "100%",
-            maxWidth: "600px",
-            backgroundColor: "white",
-            borderRadius: 2,
-            padding: 4,
-            boxShadow: 2,
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <Typography variant="h5" fontWeight="bold" sx={{ marginBottom: 4 }}>
-            Profile
-          </Typography>
-
-          <Box sx={{ display: "flex", alignItems: "center", marginBottom: 4 }}>
-            <Avatar
-              sx={{
-                width: 100,
-                height: 100,
-                marginRight: 2,
-                boxShadow: 2,
-              }}
-              src={previewImage}
-            />
-
-            <Box sx={{ display: "flex", flexDirection: "column" }}>
-              <Button
-                variant="contained"
-                sx={{ marginBottom: 1 }}
-                component="label"
-              >
-                Change Picture
-                <input
-                  type="file"
-                  name="avatar"
-                  hidden
-                  onChange={handleImageChange}
-                />
-              </Button>
-              <Button
-                variant="outlined"
-                color="error"
-                onClick={handleDeletePicture}
-              >
-                Delete Picture
-              </Button>
-            </Box>
-          </Box>
-
           <Box
-            component="form"
-            onSubmit={handleFormSubmit}
-            sx={{ "& .MuiTextField-root": { marginBottom: 2 } }}
+            sx={{
+              width: "100%",
+              maxWidth: "500px",
+              backgroundColor: "#f5f6fa",
+              borderRadius: 2,
+              padding: 4,
+            }}
           >
-            <TextField
-              fullWidth
-              name="email"
-              label="Email"
-              value={formData.email}
-              onChange={handleInputChange}
-              variant="outlined"
-              disabled
-            />
-           
-            <TextField
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              variant="outlined"
-            />
-            <Button variant="contained" type="submit">
-              Save Changes
-            </Button>
+            <Typography variant="h5" fontWeight="bold" sx={{ marginBottom: 4 }}>
+              Settings
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: 4,
+                justifyContent: "center",
+              }}
+            >
+              <Avatar
+                sx={{
+                  width: 110,
+                  height: 110,
+                  boxShadow: 2,
+                }}
+                src="/images/adminprofile.jpeg"
+              />
+            </Box>
+            {loading ? (
+              <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <Box
+                component="form"
+                onSubmit={handleFormSubmit}
+                sx={{ "& .MuiTextField-root": { marginBottom: 2 } }}
+              >
+                <TextField
+                  fullWidth
+                  name="email"
+                  disabled="true"
+                  label="Email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  variant="outlined"
+                  type="email"
+                  required
+                />
+                <TextField
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="text"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  variant="outlined"
+                  required
+                />
+                <Button
+                  variant="contained"
+                  type="submit"
+                  sx={{ mt: 2, width: "100%" }}
+                >
+                  Save Changes
+                </Button>
+              </Box>
+            )}
           </Box>
+          <Dialog open={openDialog} onClose={handleDialogClose}>
+            <DialogTitle>Confirm Changes</DialogTitle>
+            <DialogContent>
+              Are you sure you want to make these changes?
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleDialogClose} color="primary">
+                No
+              </Button>
+              <Button onClick={handleDialogConfirm} color="primary" autoFocus>
+                Yes
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Box>
       </Box>
-    </>
+    </Box>
   );
 };
 

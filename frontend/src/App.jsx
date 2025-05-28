@@ -25,14 +25,14 @@ import AllRescueInfo from './pages/userPages/AllRescueInfo'
 
 //admin
 import ManageDonation from './pages/adminPages/ManageDonation'
-import AdminHeader from './components/AdminHeader'
-import Dashboards from './pages/adminPages/Dashboards';
+import Dashboard from './pages/adminPages/Dashboard';
 import ManageGallery from './pages/adminPages/ManageGallery';
 import ManageRescue from './pages/adminPages/ManageRescue';
 import ManagePetDog from './pages/adminPages/ManagePetDog';
 import ManageVeterinary from './pages/adminPages/ManageVeterinary';
 import ManageVaccination from './pages/adminPages/ManageVaccination';
 import Setting from './pages/adminPages/Setting';
+import ManagePetRequest from './pages/adminPages/ManagePetRequest';
 
 
 function App() {
@@ -86,13 +86,14 @@ function App() {
             {
               role === 'admin' && (
                 <>
-                  <Route path="/adminDashboard" element={<Dashboards />} />
+                  <Route path="/adminDashboard" element={<Dashboard />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/Donations" element={<ManageDonation />} />
                   <Route path='/adminSetting' element={<Setting />} />
                   <Route path="/adminGallery" element={<ManageGallery />} />
                   <Route path="/manageRescue" element={<ManageRescue />} />
                   <Route path="/managePetDog" element={<ManagePetDog />} />
+                  <Route path='/managePetRequest' element={<ManagePetRequest />}/>
                   <Route path='/manageVeterinary' element={<ManageVeterinary />} />
                   <Route path='/manageVaccination' element={<ManageVaccination />} />                </>
               )

@@ -1,42 +1,67 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { IconButton, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+import {
+  DataGrid,
+  GridToolbarContainer,
+  GridToolbarExport,
+} from "@mui/x-data-grid";
+import {
+  TextField,
+  Paper,
+  Box,
+  Typography,
+  InputAdornment,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import Topbar from "../../components/adminComponents/Topbar";
+import Sidebar from "../../components/adminComponents/Sidebar";
+
+const CustomToolbar = () => (
+  <GridToolbarContainer>
+    <GridToolbarExport />
+  </GridToolbarContainer>
+);
 
 const ManageDonation = () => {
   const [donationData, setDonationData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedDonation, setSelectedDonation] = useState(null);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
 
   const columns = [
-    { field: "_id", headerName: "Donation ID", width: 120 },
     { field: "donorname", headerName: "Donor Name", width: 180 },
     { field: "contact", headerName: "Contact", width: 150 },
     { field: "donationdate", headerName: "Donation Date", width: 150 },
     { field: "description", headerName: "Description", width: 200 },
     { field: "paymentReference", headerName: "Payment Reference", width: 150 },
     { field: "amount", headerName: "Amount", width: 150 },
-    { field: "status", headerName: "Status", width: 150 },
     {
-      field: "actions",
-      headerName: "Actions",
-      width: 250,
+      field: "status",
+      headerName: "Status",
+      width: 150,
       renderCell: (params) => (
-        <>
-          <IconButton onClick={() => handleDelete(params.row._id)} color="error">
-            <DeleteIcon />
-          </IconButton>
-        </>
+        <span
+          style={{
+            borderRadius:'5px',
+            padding: "3px 4px",
+            backgroundColor: params.value === "Success" ? "#e8f5e9" : "#fff3e0",
+            color: params.value === "Success" ? "green" : "orange",
+            fontWeight: 600,
+            textTransform: "capitalize",
+          }}
+        >
+          {params.value}
+        </span>
       ),
     },
   ];
 
   const fetchDonationData = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/admin/donations");
+      const response = await axios.get(
+        "http://localhost:3000/admin/donations"
+      );
       setDonationData(response.data.donations);
       setFilteredData(response.data.donations);
     } catch (error) {
@@ -51,76 +76,89 @@ const ManageDonation = () => {
   useEffect(() => {
     setFilteredData(
       donationData.filter((donation) =>
-        donation.donorname.toLowerCase().includes(searchQuery.toLowerCase())
+        donation.donorname
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())
       )
     );
   }, [searchQuery, donationData]);
 
-  const updateStatus = async (donationId, newStatus) => {
-    try {
-      const response = await axios.patch(`http://localhost:3000/admin/donations/update-status/${donationId}`, {
-        status: newStatus,
-      });
-      if (response.status === 200) fetchDonationData();
-    } catch (error) {
-      console.error(`Error updating status for donation ID ${donationId}:`, error);
-    }
-  };
-
-  const handleDelete = (donation) => {
-    setSelectedDonation(donation);
-    setOpenDeleteDialog(true);
-  };
-
-  const confirmDelete = async () => {
-    try {
-      const response = await axios.delete(`http://localhost:3000/admin/donations/delete/${selectedDonation}`);
-      setOpenDeleteDialog(false);
-      setSelectedDonation(null);
-      if (response.status === 200) {
-        fetchDonationData();
-      }
-    } catch (error) {
-      console.error("Error deleting donation:", error);
-    }
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev) => !prev);
   };
 
   return (
-    <div>
-      <TextField
-        label="Search by Donor Name"
-        variant="outlined"
-        margin="normal"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "#f4f6f8",
+        py: 4,
+        px: { xs: 1, sm: 4 },
+      }}
+    >
+      <Topbar toggleSidebar={toggleSidebar} />
+      <Sidebar isOpen={isSidebarOpen} />
+      <Paper
+        elevation={3}
+        sx={{
+          maxWidth: 1200,
+          bgcolor: "#f4f6f8",
+          mx: "auto",
+          border: "none",
+          boxShadow: "none",
+          p: { xs: 2, sm: 4 },
+        }}
+      >
+        <Typography variant="h5" fontWeight={700} mb={3} mt={2}>
+          Manage Donations
+        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            mb: 2,
+          }}
+        >
+          <TextField
+            label="Search by Donor Name"
+            variant="outlined"
+            size="small"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{ width: 300 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon color="action" />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+        <Box sx={{ height: 500, width: "100%" }}>
+          <DataGrid
+            rows={filteredData}
+            columns={columns}
+            pageSize={8}
+            rowsPerPageOptions={[8, 16, 32]}
+            getRowId={(row) => row._id}
+            components={{ Toolbar: CustomToolbar }}
+            sx={{
+              bgcolor: "#fff",
+              borderRadius: "none",
+              "& .MuiDataGrid-columnHeaders": {
+                bgcolor: "#e3f2fd",
+                fontWeight: "bold",
+              },
+              "& .MuiDataGrid-row:hover": {
+                bgcolor: "#f4f6f8",
+              },
+            }}
+          />
+        </Box>
+      </Paper>
 
-      <div style={{ height: 400, width: "100%", marginTop: "20px" }}>
-        <DataGrid
-          rows={filteredData}
-          columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5]}
-          getRowId={(row) => row._id}
-          components={{ Toolbar: GridToolbar }}
-        />
-      </div>
-
-      <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-        <DialogTitle>Confirm Deletion</DialogTitle>
-        <DialogContent>
-          Are you sure you want to delete this donation?
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDeleteDialog(false)} color="secondary">
-            Cancel
-          </Button>
-          <Button onClick={confirmDelete} color="primary">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+    </Box>
   );
 };
 

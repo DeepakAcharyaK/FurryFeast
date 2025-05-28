@@ -105,8 +105,9 @@ const AdoptedPets = ({ userid }) => {
 
               }
               <TableBody>
-                {adoptedPets.map((pet) => {
-                  const { _id, name, breed, age, gender,image } = pet.petId;
+                {adoptedPets.map((pet,key) => {
+                  console.log(key,pet)
+                  const {_id, name, breed, age, gender,image } = pet.petId;
 
                   return (
                     <TableRow key={_id}>

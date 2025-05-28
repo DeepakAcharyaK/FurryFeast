@@ -27,8 +27,7 @@ const Login = ({ setIsloggedin, setRole }) => {
 
     if (validateLogin()) {
       try {
-
-        if (email === "admin@gmail.com" && password === "admin") {
+        if (email === "admin@gmail.com") {
           const adminResponse = await axios.post(
             "http://localhost:3000/admin/login",
             { email, password },

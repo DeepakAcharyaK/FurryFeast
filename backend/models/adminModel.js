@@ -12,10 +12,7 @@ const adminSchema = new mongoose.Schema({
         required:[true],
         default:'admin'
     },
-    profile:{
-        type:String,
-        default: "https://example.com/default-profile.png"
-    },
+
     donation:[
     {
         type:mongoose.Schema.Types.ObjectId,
