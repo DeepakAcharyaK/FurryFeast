@@ -542,7 +542,7 @@ const getDashboardStats = async (req, res) => {
   try {
     const userCount = await User.countDocuments();
     const donationCount = await Donation.countDocuments();
-    const adoptedPetCount = await Pet.countDocuments({ status: "adopted" });
+    const adoptedPetCount = await Pet.countDocuments({ adoptionStatus: "Adopted" });
     const imageCount = await Gallery.countDocuments();
     const petRequestCount = await PetRequest.countDocuments();
     const veterinaryCount = await Veterinary.countDocuments();

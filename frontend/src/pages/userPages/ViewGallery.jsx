@@ -57,7 +57,7 @@ const ViewGallery = () => {
             <Card key={item._id} sx={{ borderRadius: 2, boxShadow: 3 }}>
               <CardMedia
                 component="img"
-                image={item.image}
+                image={`http://localhost:3000${item.image}`}
                 alt={`img${item._id}`}
                 sx={{ borderRadius: 2 }}
               />

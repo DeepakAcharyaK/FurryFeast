@@ -6,15 +6,18 @@ import {
   Vaccines as VaccinesIcon,
   Settings as SettingsIcon,
 } from "@mui/icons-material";
+import { FaHome } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { FaBriefcaseMedical } from "react-icons/fa";
 import { FaCodePullRequest } from "react-icons/fa6";
+import { FaDog } from "react-icons/fa6";
 
 const menuItems = [
+  { text: "Home", icon:<FaHome style={{fontSize:25}}/>, path: "/adminDashboard" },
   { text: "Manage Rescue", icon: <PetsIcon />, path: "/manageRescue" },
   { text: "Manage Gallery", icon: <PhotoLibraryIcon />, path: "/adminGallery" },
   { text: "Manage Donation", icon: <AttachMoneyIcon />, path: "/Donations" },
-  { text: "Manage Pet", icon: <FaCodePullRequest />, path: "/managePetDog" },
+  { text: "Manage Pet", icon:<FaDog style={{fontSize:25}} />, path: "/managePetDog" },
   { text: "Manage Pet Request", icon: <FaCodePullRequest />, path: "/managePetRequest" },
   { text: "Manage Vaccination", icon: <VaccinesIcon />, path: "/manageVaccination" },
   { text: "Manage Veterinary", icon: <FaBriefcaseMedical />, path: "/manageVeterinary" },

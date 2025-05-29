@@ -21,8 +21,9 @@ const Topbar = ({ toggleSidebar, admin = { name: "Admin User", avatar: "" } }) =
   };
 
   const handleLogout = () => {
-    handleMenuClose();
-    navigate("/");
+    window.localStorage.removeItem("isloggedin");
+    window.localStorage.removeItem("role");
+    window.open('/', '_self');
   };
 
   return (

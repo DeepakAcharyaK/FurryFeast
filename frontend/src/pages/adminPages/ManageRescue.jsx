@@ -45,7 +45,7 @@ const ManageRescue = () => {
           _id: rescue._id,
         }))
       );
-      console.log(response)
+      // console.log(response)
     } catch (error) {
       console.error("Error fetching rescue data:", error);
     }
@@ -111,8 +111,9 @@ const ManageRescue = () => {
       headerName: "Rescued By",
       flex: 1,
       minWidth: 120,
-      valueGetter: (params) => params.row,
-    },
+      renderCell: (params) => {
+       return(params.row.rescueinfoby.username)
+    }},
     {
       field: "createdAt",
       headerName: "Rescue Date",

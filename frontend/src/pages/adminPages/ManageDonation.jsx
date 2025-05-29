@@ -32,9 +32,9 @@ const ManageDonation = () => {
   const columns = [
     { field: "donorname", headerName: "Donor Name", width: 180 },
     { field: "contact", headerName: "Contact", width: 150 },
-    { field: "donationdate", headerName: "Donation Date", width: 150 },
+    // { field: "donationdate", headerName: "Donation Date", width: 150 },
     { field: "description", headerName: "Description", width: 200 },
-    { field: "paymentReference", headerName: "Payment Reference", width: 150 },
+    // { field: "paymentReference", headerName: "Payment Reference", width: 150 },
     { field: "amount", headerName: "Amount", width: 150 },
     {
       field: "status",

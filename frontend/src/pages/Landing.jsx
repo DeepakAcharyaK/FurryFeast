@@ -141,7 +141,7 @@ function Gallery({ navigate, userid }) {
             const randomImage = gallery[randomIndex].image;
 
             const newElement = document.createElement('img');
-            newElement.setAttribute('src', randomImage);
+            newElement.setAttribute('src', `http://localhost:3000${randomImage}`);
             newElement.style.position = 'absolute';
             newElement.style.height = '300px';
             newElement.style.width = '200px';
@@ -184,7 +184,7 @@ function Veterinery({ navigate, userid }) {
   }, []);
 
   return (
-    <div className="page flex" style={{ backgroundColor: '' }} id="gallery">
+    <div className="page flex" style={{ backgroundColor: '',height:'auto' }} id="gallery">
       <h1 className="work-title head">(Veterinery)</h1>
       <div className="work-details"style={{display:'flex',justifyContent:'center'}}>
           <span>({veterinery.length})</span>
